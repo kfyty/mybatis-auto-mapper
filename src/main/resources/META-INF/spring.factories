@@ -1,0 +1,1 @@
+org.springframework.context.ApplicationListener=com.kfyty.mybatis.jpa.support.listener.MybatisJpaSupportListener
