@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper>
+    <insert id="insert" parameterType="%s">
+        insert into %s values ( %s )
+    </insert>
+
+    <insert id="insertAll" parameterType="%s">
+        <foreach collection="%s" item="%s" open="" close="" separator=";">
+            insert into %s values ( %s )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="%s">
+        update %s
+        <set>
+            %s
+        </set>
+        where %s = %s
+    </update>
+
+    <update id="updateAll" parameterType="%s">
+        <foreach collection="%s" item="%s" open="" close="" separator=";">
+            update %s
+            <set>
+                %s
+            </set>
+            where %s = %s
+        </foreach>
+    </update>
+
+    <select id="findBy" resultType="%s">
+        select * from %s where ( %s )
+    </select>
+
+    <select id="findAll" resultType="%s">
+        select * from %s
+    </select>
+
+    <delete id="deleteBy">
+        delete from %s where ( %s )
+    </delete>
+
+    <delete id="deleteAll">
+        delete from %s
+    </delete>
+</mapper>

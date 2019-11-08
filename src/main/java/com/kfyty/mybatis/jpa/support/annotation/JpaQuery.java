@@ -15,7 +15,27 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JpaQuery {
+    /**
+     * 更新时指定主键属性
+     * @return
+     */
+    String primaryKey() default "id";
+
+    /**
+     * 实体类后缀
+     * @return
+     */
     String suffix() default "";
 
+    /**
+     * 返回值为 Map 时需指定 key 属性
+     * @return
+     */
     String mapKey() default "";
+
+    /**
+     * 删除操作时需指定表名，否则尝试根据 Mapper 接口类名解析表名
+     * @return
+     */
+    String table() default "";
 }

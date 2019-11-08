@@ -1,5 +1,8 @@
 package com.kfyty.mybatis.jpa.support.match;
 
+import org.apache.ibatis.parsing.XPathParser;
+
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 /**
@@ -10,14 +13,19 @@ import java.util.Objects;
  * @since JDK 1.8
  */
 public enum SQLOperateEnum {
-    OPERATE_INSERT("insert", " insert into %s values ( %s ) "),
-    OPERATE_UPDATE("update", " update %s set %s where %s = %s "),
-    OPERATE_INSERT_ALL("insertAll", " insert into %s values ( %s ) "),
-    OPERATE_UPDATE_ALL("updateAll", " update %s set %s where %s = %s "),
-    OPERATE_SELECT_ALL("findAll", " select * from %s "),
-    OPERATE_DELETE_ALL("deleteAll", " delete from %s "),
-    OPERATE_SELECT_BY("findBy", " select * from %s where ( %s ) "),
-    OPERATE_DELETE_BY("deleteBy", " delete from %s where ( %s ) ");
+    OPERATE_INSERT("insert", ""),
+    OPERATE_UPDATE("update", ""),
+    OPERATE_INSERT_ALL("insertAll", " "),
+    OPERATE_UPDATE_ALL("updateAll", ""),
+    OPERATE_SELECT_BY("findBy", ""),
+    OPERATE_SELECT_ALL("findAll", ""),
+    OPERATE_DELETE_BY("deleteBy", ""),
+    OPERATE_DELETE_ALL("deleteAll", "");
+
+    static {
+        XPathParser xPathParser = new XPathParser(new InputStreamReader(SQLOperateEnum.class.getResourceAsStream("/mapper-template.xml")));
+        xPathParser.evalNode("/mapper").getChildren().forEach(e -> SQLOperateEnum.matchSQLOperate(e.getStringAttribute("id")).template = e.toString());
+    }
 
     private String operate;
     private String template;

@@ -1,22 +1,20 @@
 package com.kfyty.mybatis.jpa.support.handle;
 
 import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
-import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.builder.SqlSourceBuilder;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
+import org.apache.ibatis.builder.IncompleteElementException;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.builder.xml.XMLStatementBuilder;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +30,7 @@ public class MethodHandler {
     private Method method;
     private Class<?> returnType;
     private Configuration configuration;
-    private MappedStatement mappedStatement;
     private List<String> queryParameters;
-    private List<ResultMapping> resultMappings;
 
     public MethodHandler(Method method, Configuration configuration) {
         this.method = method;
@@ -42,8 +38,16 @@ public class MethodHandler {
     }
 
     public MethodHandler parse() {
-        this.initResultMappings();
-        this.initMappedStatement();
+        MapperHandler mapperHandler = new MapperHandler(this).parse();
+        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, mapperHandler.getMapperXml());
+        mapperBuilderAssistant.setCurrentNamespace(this.getMethod().getDeclaringClass().getName());
+        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperLabel());
+        XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
+        try {
+            xmlStatementBuilder.parseStatementNode();
+        } catch (IncompleteElementException e) {
+            configuration.addIncompleteStatement(xmlStatementBuilder);
+        }
         return this;
     }
 
@@ -92,42 +96,5 @@ public class MethodHandler {
             }
         }
         return this.returnType;
-    }
-
-    public List<ResultMapping> getResultMappings() {
-        if(resultMappings == null) {
-            this.initResultMappings();
-        }
-        return this.resultMappings;
-    }
-
-    public MappedStatement getMappedStatement() {
-        if(mappedStatement == null) {
-            this.parse();
-        }
-        return this.mappedStatement;
-    }
-
-    private void initResultMappings() {
-        Map<String, Field> fieldMap = CommonUtil.getFieldMap(this.getReturnType());
-        this.resultMappings = new ArrayList<>();
-        for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
-            this.resultMappings.add(new ResultMapping.Builder(configuration, entry.getKey(), CommonUtil.convert2Underline(entry.getKey(), true), entry.getValue().getType()).build());
-        }
-    }
-
-    private void initMappedStatement() {
-        SQLHandler sqlHandler = new SQLHandler(this).parse();
-        this.mappedStatement = new MappedStatement.Builder(
-                configuration,
-                this.getId(),
-                new SqlSourceBuilder(configuration).parse(sqlHandler.getSQL(), Object.class, null),
-                sqlHandler.getSQLCommandType())
-                .resultMaps(Collections.singletonList(new ResultMap.Builder(
-                        configuration,
-                        this.getReturnType().getName() + "Map",
-                        this.getReturnType(),
-                        this.getResultMappings()).build()))
-                .build();
     }
 }

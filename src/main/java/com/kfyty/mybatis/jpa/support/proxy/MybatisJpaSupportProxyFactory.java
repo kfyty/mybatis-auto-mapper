@@ -53,10 +53,16 @@ public class MybatisJpaSupportProxyFactory implements InvocationHandler, Factory
         try {
             this.sqlSessionTemplate.getConfiguration().getMappedStatement(methodHandler.getId());
         } catch(IllegalArgumentException e) {
-            this.sqlSessionTemplate.getConfiguration().addMappedStatement(methodHandler.parse().getMappedStatement());
+            methodHandler.parse();
         }
         Class<?> returnType = method.getReturnType();
         Map<String, Object> queryParameters = this.prepareQueryParameters(method.getParameters(), args);
+        if(method.getName().contains("insert")) {
+            return this.sqlSessionTemplate.insert(methodHandler.getId(), queryParameters);
+        }
+        if(method.getName().contains("update")) {
+            return this.sqlSessionTemplate.update(methodHandler.getId(), queryParameters);
+        }
         if(method.getName().contains("delete")) {
             return this.sqlSessionTemplate.delete(methodHandler.getId(), queryParameters);
         }
