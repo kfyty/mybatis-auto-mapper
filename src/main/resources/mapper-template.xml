@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapper>
     <insert id="insert" parameterType="%s">
-        insert into %s values ( %s )
+        insert into %s ( %s ) values ( %s )
     </insert>
 
     <insert id="insertAll" parameterType="%s">
@@ -12,18 +12,18 @@
 
     <update id="update" parameterType="%s">
         update %s
-        <set>
+        &lt;set&gt;
             %s
-        </set>
+        &lt;/set&gt;
         where %s = %s
     </update>
 
     <update id="updateAll" parameterType="%s">
         <foreach collection="%s" item="%s" open="" close="" separator=";">
             update %s
-            <set>
+            &lt;set&gt;
                 %s
-            </set>
+            &lt;/set&gt;
             where %s = %s
         </foreach>
     </update>

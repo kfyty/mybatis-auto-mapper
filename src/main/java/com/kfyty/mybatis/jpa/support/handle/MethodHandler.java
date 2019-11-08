@@ -1,6 +1,8 @@
 package com.kfyty.mybatis.jpa.support.handle;
 
 import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
+import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
+import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -26,9 +28,9 @@ import java.util.Map;
  * @since JDK 1.8
  */
 public class MethodHandler {
-    private String id;
     private Method method;
     private Class<?> returnType;
+    private Class<?> parameterType;
     private Configuration configuration;
     private List<String> queryParameters;
 
@@ -41,7 +43,7 @@ public class MethodHandler {
         MapperHandler mapperHandler = new MapperHandler(this).parse();
         MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, mapperHandler.getMapperXml());
         mapperBuilderAssistant.setCurrentNamespace(this.getMethod().getDeclaringClass().getName());
-        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperLabel());
+        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperXmlLabel());
         XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
         try {
             xmlStatementBuilder.parseStatementNode();
@@ -51,11 +53,8 @@ public class MethodHandler {
         return this;
     }
 
-    public String getId() {
-        if(id == null) {
-            this.id = this.getMethod().getDeclaringClass().getName() + "." + method.getName();
-        }
-        return this.id;
+    public String getSuffix() {
+        return method.getAnnotation(JpaQuery.class).suffix();
     }
 
     public Method getMethod() {
@@ -76,10 +75,6 @@ public class MethodHandler {
         return this.queryParameters;
     }
 
-    public String getSuffix() {
-        return method.getAnnotation(JpaQuery.class).suffix();
-    }
-
     public Class<?> getReturnType() {
         if(returnType != null) {
             return this.returnType;
@@ -96,5 +91,21 @@ public class MethodHandler {
             }
         }
         return this.returnType;
+    }
+
+    public Class<?> getParameterType() {
+        if(parameterType != null) {
+            return parameterType;
+        }
+        if(CommonUtil.empty(method.getParameterTypes())) {
+            throw new IllegalArgumentException("build sql error: parameter type is null !");
+        }
+        if(method.getName().contains(SQLOperateEnum.OPERATE_INSERT_ALL.operate()) || method.getName().contains(SQLOperateEnum.OPERATE_UPDATE_ALL.operate())) {
+            this.parameterType = (Class<?>) ((ParameterizedType) method.getGenericParameterTypes()[0]).getActualTypeArguments()[0];
+        }
+        if(method.getName().contains(SQLOperateEnum.OPERATE_INSERT.operate()) || method.getName().contains(SQLOperateEnum.OPERATE_UPDATE.operate())) {
+            this.parameterType = method.getParameterTypes()[0];
+        }
+        return this.parameterType;
     }
 }

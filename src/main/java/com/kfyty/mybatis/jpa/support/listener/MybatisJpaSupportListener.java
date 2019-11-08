@@ -1,14 +1,15 @@
 package com.kfyty.mybatis.jpa.support.listener;
 
-import com.kfyty.mybatis.jpa.support.proxy.MybatisJpaSupportProxyFactory;
+import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
+import com.kfyty.mybatis.jpa.support.handle.MethodHandler;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -23,19 +24,20 @@ public class MybatisJpaSupportListener implements ApplicationListener<Applicatio
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if(applicationEvent instanceof ContextRefreshedEvent) {
-            this.generateNewBeanDefine((ContextRefreshedEvent) applicationEvent);
+            this.parseMapperInterface((ContextRefreshedEvent) applicationEvent);
         }
     }
 
-    private void generateNewBeanDefine(ContextRefreshedEvent contextRefreshedEvent) {
+    private void parseMapperInterface(ContextRefreshedEvent contextRefreshedEvent) {
         ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) contextRefreshedEvent.getApplicationContext();
-        DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
         Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(Mapper.class);
         for (Map.Entry<String, Object> entry : beansWithAnnotation.entrySet()) {
-            BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisJpaSupportProxyFactory.class);
-            beanDefinitionBuilder.addConstructorArgValue(entry.getValue());
-            beanFactory.removeBeanDefinition(entry.getKey());
-            beanFactory.registerBeanDefinition(entry.getKey(), beanDefinitionBuilder.getBeanDefinition());
+            Method[] methods = entry.getValue().getClass().getInterfaces()[0].getMethods();
+            for (Method method : methods) {
+                if(method.isAnnotationPresent(JpaQuery.class)) {
+                    new MethodHandler(method, applicationContext.getBean(SqlSessionTemplate.class).getConfiguration()).parse();
+                }
+            }
         }
     }
 }
