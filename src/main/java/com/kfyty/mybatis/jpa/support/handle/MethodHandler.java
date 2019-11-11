@@ -53,6 +53,10 @@ public class MethodHandler {
         return this;
     }
 
+    public String getColumns() {
+        return method.getAnnotation(JpaQuery.class).columns();
+    }
+
     public String getSuffix() {
         return method.getAnnotation(JpaQuery.class).suffix();
     }

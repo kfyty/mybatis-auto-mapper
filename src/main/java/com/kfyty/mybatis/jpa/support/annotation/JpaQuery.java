@@ -38,4 +38,10 @@ public @interface JpaQuery {
      * @return
      */
     String table() default "";
+
+    /**
+     * 指定需要查询的列
+     * @return
+     */
+    String columns() default "*";
 }

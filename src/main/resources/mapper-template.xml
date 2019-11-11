@@ -29,11 +29,11 @@
     </update>
 
     <select id="findBy" resultType="%s">
-        select * from %s where ( %s )
+        select %s from %s where ( %s )
     </select>
 
     <select id="findAll" resultType="%s">
-        select * from %s
+        select %s from %s
     </select>
 
     <delete id="deleteBy">

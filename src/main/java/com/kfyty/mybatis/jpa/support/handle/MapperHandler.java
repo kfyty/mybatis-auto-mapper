@@ -46,7 +46,10 @@ public class MapperHandler {
         }
         this.table = CommonUtil.convert2Underline(this.methodHandler.getReturnType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
         if(this.tableNameInvalid()) {
-            if(operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL)) {
+            if(operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY)       ||
+                    operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL) ||
+                    operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_BY)  ||
+                    operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_ALL)) {
                 this.table = methodHandler.getMethod().getAnnotation(JpaQuery.class).table();
                 if(CommonUtil.empty(table)) {
                     this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
@@ -89,9 +92,10 @@ public class MapperHandler {
     }
 
     private boolean tableNameInvalid() {
-        return methodHandler.getReturnType().equals(Void.class)     ||
-                methodHandler.getReturnType().equals(void.class)    ||
-                methodHandler.getReturnType().equals(Integer.class) ||
+        return !methodHandler.getColumns().equals("*")               ||
+                methodHandler.getReturnType().equals(Void.class)     ||
+                methodHandler.getReturnType().equals(void.class)     ||
+                methodHandler.getReturnType().equals(Integer.class)  ||
                 methodHandler.getReturnType().equals(int.class);
     }
 
@@ -107,11 +111,11 @@ public class MapperHandler {
     }
 
     private void operateSelectBy() {
-        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), this.getTable(), this.buildCondition());
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), methodHandler.getColumns(), this.getTable(), this.buildCondition());
     }
 
     private void operateSelectAll() {
-        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), this.getTable());
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), methodHandler.getColumns(), this.getTable());
     }
 
     private void operateDeleteBy() {
@@ -164,7 +168,7 @@ public class MapperHandler {
                 if(matcher.find()) {
                     throw new IllegalArgumentException("build sql error: order by must be last statement !");
                 }
-                builder.append(this.buildConditionOrderBy(conditions.get(i)));
+                builder.append(this.buildConditionOfOrderBy(conditions.get(i)));
                 break;
             }
             SQLConditionEnum conditionEnum = SQLConditionEnum.matchSQLCondition(conditions.get(i));
@@ -182,37 +186,40 @@ public class MapperHandler {
 
     private void buildBranchCondition(int index, List<String> queryParameters, SQLConditionEnum conditionEnum, StringBuilder builder) {
         if(conditionEnum.equals(SQLConditionEnum.CONDITION_BETWEEN)) {
-            builder.append(buildConditionBetween(index, queryParameters, conditionEnum));
+            builder.append(buildConditionOfBetween(index, queryParameters, conditionEnum));
             return;
         }
-        if(conditionEnum.equals(SQLConditionEnum.CONDITION_IsNull)) {
-            builder.append(buildConditionIsNull(index, queryParameters, conditionEnum));
+        if(conditionEnum.equals(SQLConditionEnum.CONDITION_IsNull) || conditionEnum.equals(SQLConditionEnum.CONDITION_NotNull)) {
+            builder.append(buildConditionOfNull(index, queryParameters, conditionEnum));
             return;
         }
-        if(conditionEnum.equals(SQLConditionEnum.CONDITION_NotNull)) {
-            builder.append(buildConditionNotNull(index, queryParameters, conditionEnum));
+        if(conditionEnum.equals(SQLConditionEnum.CONDITION_In) || conditionEnum.equals(SQLConditionEnum.CONDITION_NotIn)) {
+            builder.append(buildConditionOfIn(index, queryParameters, conditionEnum));
             return;
         }
         builder.append(String.format(conditionEnum.template(), queryParameters.get(index)));
     }
 
-    private String buildConditionBetween(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
+    private String buildConditionOfBetween(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
         String sqlPart =  String.format(conditionEnum.template(), queryParameters.get(index), queryParameters.get(index + 1));
         queryParameters.remove(index);
         return sqlPart;
     }
 
-    private String buildConditionIsNull(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
+    private String buildConditionOfNull(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
         queryParameters.add(index, null);
         return conditionEnum.template();
     }
 
-    private String buildConditionNotNull(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
-        queryParameters.add(index, null);
-        return conditionEnum.template();
+    private String buildConditionOfIn(int index, List<String> queryParameters, SQLConditionEnum conditionEnum) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<foreach collection=\"").append(queryParameters.get(index)).append("\" item=\"item\" separator=\", \">");
+        builder.append("#{item}");
+        builder.append("</foreach>");
+        return String.format(conditionEnum.template(), builder.toString());
     }
 
-    private String buildConditionOrderBy(String column) {
+    private String buildConditionOfOrderBy(String column) {
         StringBuilder builder = new StringBuilder();
         List<String> conditions = Arrays.stream(column.split("Asc|Desc")).filter(e -> !e.isEmpty()).collect(Collectors.toList());
         builder.append(" order by ");
