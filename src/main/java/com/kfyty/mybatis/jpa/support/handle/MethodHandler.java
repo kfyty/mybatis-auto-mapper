@@ -84,6 +84,9 @@ public class MethodHandler {
             return this.returnType;
         }
         this.returnType = method.getReturnType();
+        if(returnType.isArray()) {
+            return this.returnType = returnType.getComponentType();
+        }
         Type genericReturnType = method.getGenericReturnType();
         if(genericReturnType instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
