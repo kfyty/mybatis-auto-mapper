@@ -5,9 +5,10 @@
     </insert>
 
     <insert id="insertAll" parameterType="%s">
-        <foreach collection="%s" item="%s" open="" close="" separator=";">
-            insert into %s values ( %s )
-        </foreach>
+        insert into %s ( %s ) values
+        &lt;foreach collection="%s" item="item" open="" close="" separator=", "&gt;
+            ( %s )
+        &lt;/foreach&gt;
     </insert>
 
     <update id="update" parameterType="%s">
@@ -19,7 +20,7 @@
     </update>
 
     <update id="updateAll" parameterType="%s">
-        <foreach collection="%s" item="%s" open="" close="" separator=";">
+        <foreach collection="%s" item="item" open="" close="" separator=";">
             update %s
             &lt;set&gt;
                 %s

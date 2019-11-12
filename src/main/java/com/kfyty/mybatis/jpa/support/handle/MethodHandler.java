@@ -106,9 +106,11 @@ public class MethodHandler {
         }
         if(method.getName().contains(SQLOperateEnum.OPERATE_INSERT_ALL.operate()) || method.getName().contains(SQLOperateEnum.OPERATE_UPDATE_ALL.operate())) {
             this.parameterType = (Class<?>) ((ParameterizedType) method.getGenericParameterTypes()[0]).getActualTypeArguments()[0];
+            return this.parameterType;
         }
         if(method.getName().contains(SQLOperateEnum.OPERATE_INSERT.operate()) || method.getName().contains(SQLOperateEnum.OPERATE_UPDATE.operate())) {
             this.parameterType = method.getParameterTypes()[0];
+            return this.parameterType;
         }
         return this.parameterType;
     }

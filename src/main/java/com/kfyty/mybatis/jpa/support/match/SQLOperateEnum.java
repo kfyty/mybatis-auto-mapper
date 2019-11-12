@@ -13,10 +13,10 @@ import java.util.Objects;
  * @since JDK 1.8
  */
 public enum SQLOperateEnum {
+    OPERATE_INSERT_ALL("insertAll", ""),
+    OPERATE_UPDATE_ALL("updateAll", ""),
     OPERATE_INSERT("insert", ""),
     OPERATE_UPDATE("update", ""),
-    OPERATE_INSERT_ALL("insertAll", " "),
-    OPERATE_UPDATE_ALL("updateAll", ""),
     OPERATE_SELECT_BY("findBy", ""),
     OPERATE_SELECT_ALL("findAll", ""),
     OPERATE_DELETE_BY("deleteBy", ""),

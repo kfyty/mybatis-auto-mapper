@@ -44,23 +44,20 @@ public class MapperHandler {
         if(table != null) {
             return this.table;
         }
-        this.table = CommonUtil.convert2Underline(this.methodHandler.getReturnType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
-        if(this.tableNameInvalid()) {
-            if(operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY)       ||
-                    operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL) ||
-                    operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_BY)  ||
-                    operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_ALL)) {
-                this.table = methodHandler.getMethod().getAnnotation(JpaQuery.class).table();
-                if(CommonUtil.empty(table)) {
-                    this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
-                }
-                return this.table;
-            }
-            this.table = methodHandler.getMethod().getAnnotation(JpaQuery.class).table();
-            if(CommonUtil.empty(table)) {
-                this.table = CommonUtil.convert2Underline(methodHandler.getParameterType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
-            }
+        this.table = methodHandler.getMethod().getAnnotation(JpaQuery.class).table();
+        if(!CommonUtil.empty(this.table)) {
+            return this.table;
         }
+        this.table = CommonUtil.convert2Underline(this.methodHandler.getReturnType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
+        if(!this.tableNameInvalid()) {
+            return this.table;
+        }
+        if(operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_ALL) ||
+                operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL)) {
+            this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
+            return this.table;
+        }
+        this.table = CommonUtil.convert2Underline(methodHandler.getParameterType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
         return this.table;
     }
 
@@ -104,10 +101,20 @@ public class MapperHandler {
         this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), insertStatement[0], insertStatement[1]);
     }
 
+    private void operateInsertAll() {
+        String[] insertStatement = this.buildInsertAllStatement();
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), insertStatement[0], methodHandler.getQueryParameters().get(0), insertStatement[1]);
+    }
+
     private void operateUpdate() {
         String entity = methodHandler.getQueryParameters().get(0);
         String primaryKey = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
         this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), this.buildUpdateStatement(), primaryKey, "#{" + entity + "." + primaryKey + "}");
+    }
+
+    private void operateUpdateAll() {
+        String primaryKey = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), methodHandler.getQueryParameters().get(0), this.getTable(), this.buildUpdateAllStatement(), primaryKey, "#{item." + primaryKey + "}");
     }
 
     private void operateSelectBy() {
@@ -140,6 +147,19 @@ public class MapperHandler {
         };
     }
 
+    private String[] buildInsertAllStatement() {
+        StringBuilder[] builder = new StringBuilder[] {new StringBuilder(), new StringBuilder()};
+        Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
+        for (String field : fieldMap.keySet()) {
+            builder[0].append(CommonUtil.convert2Underline(field, true)).append(", ");
+            builder[1].append("#{item.").append(field).append("}, ");
+        }
+        return new String[] {
+                builder[0].delete(builder[0].length() - 2, builder[0].length()).toString(),
+                builder[1].delete(builder[1].length() - 2, builder[1].length()).toString()
+        };
+    }
+
     private String buildUpdateStatement() {
         StringBuilder builder = new StringBuilder();
         String entity = methodHandler.getQueryParameters().get(0);
@@ -152,6 +172,22 @@ public class MapperHandler {
             }
             builder.append("\">");
             builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+            builder.append("</if>");
+        }
+        return builder.toString();
+    }
+
+    private String buildUpdateAllStatement() {
+        StringBuilder builder = new StringBuilder();
+        Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
+        for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
+            builder.append("<if test=\"");
+            builder.append("item.").append(entry.getKey()).append(" != null ");
+            if(String.class.isAssignableFrom(entry.getValue().getType())) {
+                builder.append(" and ").append("item.").append(entry.getKey()).append(" != '' ");
+            }
+            builder.append("\">");
+            builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{item.").append(entry.getKey()).append("}, ");
             builder.append("</if>");
         }
         return builder.toString();
