@@ -63,10 +63,7 @@ public class MapperHandler {
     }
 
     public String getMapperXml() {
-        if(xml == null) {
-            this.parse();
-        }
-        return this.xml;
+        return this.xml != null ? this.xml : this.parse().getMapperXml();
     }
 
     private String getMapperXmlTemplate() {

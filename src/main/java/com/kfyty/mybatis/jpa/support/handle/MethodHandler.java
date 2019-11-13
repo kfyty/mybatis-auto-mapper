@@ -95,11 +95,9 @@ public class MethodHandler {
         if(genericReturnType instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
             if(Collection.class.isAssignableFrom(returnType)) {
-                this.returnType = (Class<?>) actualTypeArguments[0];
+                return this.returnType = (Class<?>) actualTypeArguments[0];
             }
-            if(Map.class.isAssignableFrom(returnType)) {
-                this.returnType = (Class<?>) actualTypeArguments[1];
-            }
+            throw new IllegalArgumentException("build sql error: return type must be Map/Collection/Pojo type !");
         }
         return this.returnType;
     }
