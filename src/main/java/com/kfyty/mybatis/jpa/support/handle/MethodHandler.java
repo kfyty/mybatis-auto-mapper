@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,10 +84,13 @@ public class MethodHandler {
         if(returnType != null) {
             return this.returnType;
         }
-        this.returnType = method.getReturnType();
-        if(returnType.isArray()) {
+        if(Map.class.isAssignableFrom(method.getReturnType())) {
+            return this.returnType = HashMap.class;
+        }
+        if(method.getReturnType().isArray()) {
             return this.returnType = returnType.getComponentType();
         }
+        this.returnType = method.getReturnType();
         Type genericReturnType = method.getGenericReturnType();
         if(genericReturnType instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();

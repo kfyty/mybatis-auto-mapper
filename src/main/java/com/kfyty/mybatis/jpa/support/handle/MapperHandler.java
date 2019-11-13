@@ -7,6 +7,7 @@ import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -93,7 +94,8 @@ public class MapperHandler {
                 methodHandler.getReturnType().equals(Void.class)     ||
                 methodHandler.getReturnType().equals(void.class)     ||
                 methodHandler.getReturnType().equals(Integer.class)  ||
-                methodHandler.getReturnType().equals(int.class);
+                methodHandler.getReturnType().equals(int.class)      ||
+                methodHandler.getReturnType().equals(HashMap.class);
     }
 
     private void operateInsert() {

@@ -28,12 +28,6 @@ public @interface JpaQuery {
     String suffix() default "";
 
     /**
-     * 返回值为 Map 时需指定 key 属性
-     * @return
-     */
-    String mapKey() default "";
-
-    /**
      * 删除操作时需指定表名，否则尝试根据 Mapper 接口类名解析表名
      * @return
      */
