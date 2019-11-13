@@ -20,7 +20,8 @@ public enum SQLOperateEnum {
     OPERATE_SELECT_BY("findBy", ""),
     OPERATE_SELECT_ALL("findAll", ""),
     OPERATE_DELETE_BY("deleteBy", ""),
-    OPERATE_DELETE_ALL("deleteAll", "");
+    OPERATE_DELETE_ALL("deleteAll", ""),
+    OPERATE_COUNT_BY("countBy", "");
 
     static {
         XPathParser xPathParser = new XPathParser(new InputStreamReader(SQLOperateEnum.class.getResourceAsStream("/mapper-template.xml")));

@@ -54,7 +54,7 @@ public class MapperHandler {
             return this.table;
         }
         if(operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_ALL) ||
-                operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL)) {
+                operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL) || operateEnum.equals(SQLOperateEnum.OPERATE_COUNT_BY)) {
             this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
             return this.table;
         }
@@ -133,6 +133,11 @@ public class MapperHandler {
 
     private void operateDeleteAll() {
         this.xml = String.format(this.getMapperXmlTemplate(), this.getTable());
+    }
+
+    private void operateCountBy() {
+        String columns = methodHandler.getColumns().equals("*") ? "count(*)" : methodHandler.getColumns();
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), columns, this.getTable(), this.buildCondition());
     }
 
     private String[] buildInsertStatement() {

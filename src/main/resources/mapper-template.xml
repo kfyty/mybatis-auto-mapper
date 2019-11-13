@@ -44,4 +44,8 @@
     <delete id="deleteAll">
         delete from %s
     </delete>
+
+    <select id="countBy" resultType="%s">
+        select %s from %s where ( %s )
+    </select>
 </mapper>
