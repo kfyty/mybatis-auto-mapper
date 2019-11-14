@@ -134,6 +134,21 @@ public class MybatisJpaSupportTest {
         return null;
     }
 
+    /**
+     * 返回值为 Page<E> 或 pageBy/pageAll 开头的方法自动分页
+     * 返回值泛型须存在
+     * 方法参数最后两参数应依次为 pageNum, pageSize
+     * 若需要返回 PageInfo 需自行转换
+     * @param sid
+     * @param eid
+     * @param ids
+     * @return
+     */
+    @JpaQuery
+    public List<MybatisJpaSupportTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
+        return null;
+    }
+
     @Test
     public void test() {
         MethodHandler methodHandler = null;
@@ -175,6 +190,9 @@ public class MybatisJpaSupportTest {
         System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
 
         methodHandler = new MethodHandler(this.getMethod("countById", Integer.class), null);
+        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+
+        methodHandler = new MethodHandler(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class), null);
         System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
     }
 }

@@ -66,6 +66,10 @@ public class MethodHandler {
         return this.method;
     }
 
+    public boolean useDefault() {
+        return method.getAnnotation(JpaQuery.class).useDefault();
+    }
+
     public List<String> getQueryParameters() {
         if(queryParameters != null) {
             return this.queryParameters;

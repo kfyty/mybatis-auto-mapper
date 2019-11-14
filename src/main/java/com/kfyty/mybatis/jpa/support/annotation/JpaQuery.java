@@ -38,4 +38,10 @@ public @interface JpaQuery {
      * @return
      */
     String columns() default "*";
+
+    /**
+     * 插入时，遇到 null 是否转换为插入数据库默认值
+     * @return
+     */
+    boolean useDefault() default true;
 }

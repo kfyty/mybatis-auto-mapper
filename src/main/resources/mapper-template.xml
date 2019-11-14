@@ -37,6 +37,15 @@
         select %s from %s
     </select>
 
+
+    <select id="pageBy" resultType="%s">
+        select %s from %s where ( %s )
+    </select>
+
+    <select id="pageAll" resultType="%s">
+        select %s from %s
+    </select>
+
     <delete id="deleteBy">
         delete from %s where ( %s )
     </delete>
@@ -47,5 +56,9 @@
 
     <select id="countBy" resultType="%s">
         select %s from %s where ( %s )
+    </select>
+
+    <select id="countAll" resultType="%s">
+        select %s from %s
     </select>
 </mapper>

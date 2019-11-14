@@ -53,12 +53,12 @@ public class MapperHandler {
         if(!this.tableNameInvalid()) {
             return this.table;
         }
-        if(operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_SELECT_ALL) ||
-                operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY) || operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_ALL) || operateEnum.equals(SQLOperateEnum.OPERATE_COUNT_BY)) {
-            this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
+        if(operateEnum.equals(SQLOperateEnum.OPERATE_INSERT) || operateEnum.equals(SQLOperateEnum.OPERATE_INSERT_ALL) ||
+                operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE) || operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE_ALL)) {
+            this.table = CommonUtil.convert2Underline(methodHandler.getParameterType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
             return this.table;
         }
-        this.table = CommonUtil.convert2Underline(methodHandler.getParameterType().getSimpleName().replace(methodHandler.getSuffix(), ""), true);
+        this.table = CommonUtil.convert2Underline(methodHandler.getMethod().getDeclaringClass().getSimpleName().replaceAll("Mapper|Dao", ""), true);
         return this.table;
     }
 
@@ -77,11 +77,11 @@ public class MapperHandler {
         if(operateEnum.name().contains("UPDATE")) {
             return "/update";
         }
-        if(operateEnum.name().contains("SELECT")) {
-            return "/select";
-        }
         if(operateEnum.name().contains("DELETE")) {
             return "/delete";
+        }
+        if(operateEnum.name().contains("SELECT") || operateEnum.name().contains("PAGE") || operateEnum.name().contains("COUNT")) {
+            return "/select";
         }
         throw new IllegalArgumentException("build sql error: match mapper label failed !");
     }
@@ -96,7 +96,7 @@ public class MapperHandler {
     }
 
     private void operateInsert() {
-        String[] insertStatement = this.buildInsertStatement();
+        String[] insertStatement = this.buildInsertStatement(methodHandler.getQueryParameters().get(0));
         this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), insertStatement[0], insertStatement[1]);
     }
 
@@ -108,7 +108,7 @@ public class MapperHandler {
     private void operateUpdate() {
         String entity = methodHandler.getQueryParameters().get(0);
         String primaryKey = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
-        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), this.buildUpdateStatement(), primaryKey, "#{" + entity + "." + primaryKey + "}");
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), this.buildUpdateStatement(entity), primaryKey, "#{" + entity + "." + primaryKey + "}");
     }
 
     private void operateUpdateAll() {
@@ -124,6 +124,14 @@ public class MapperHandler {
         this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), methodHandler.getColumns(), this.getTable());
     }
 
+    private void operatePageBy() {
+        this.operateSelectBy();
+    }
+
+    private void operatePageAll() {
+        this.operateSelectAll();
+    }
+
     private void operateDeleteBy() {
         this.xml = String.format(this.getMapperXmlTemplate(), this.getTable(), this.buildCondition());
     }
@@ -137,36 +145,41 @@ public class MapperHandler {
         this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), columns, this.getTable(), this.buildCondition());
     }
 
-    private String[] buildInsertStatement() {
+    private void operateCountAll() {
+        String columns = methodHandler.getColumns().equals("*") ? "count(*)" : methodHandler.getColumns();
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getReturnType().getName(), columns, this.getTable());
+    }
+
+    private String[] buildInsertStatement(String entity) {
         StringBuilder[] builder = new StringBuilder[] {new StringBuilder(), new StringBuilder()};
-        String entity = methodHandler.getQueryParameters().get(0);
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
+        builder[1].append(methodHandler.useDefault() ? "<trim suffixOverrides=\", \">" : "");
         for (String field : fieldMap.keySet()) {
             builder[0].append(CommonUtil.convert2Underline(field, true)).append(", ");
+            if(!methodHandler.useDefault()) {
+                builder[1].append("#{").append(entity).append(".").append(field).append("}, ");
+                continue;
+            }
+            builder[1].append("<if test=\"").append(entity).append(".").append(field).append(" == null\">");
+            builder[1].append("default, ");
+            builder[1].append("</if>");
+            builder[1].append("<if test=\"").append(entity).append(".").append(field).append(" != null\">");
             builder[1].append("#{").append(entity).append(".").append(field).append("}, ");
+            builder[1].append("</if>");
         }
+        builder[1].append(methodHandler.useDefault() ? "</trim>" : "");
         return new String[] {
                 builder[0].delete(builder[0].length() - 2, builder[0].length()).toString(),
-                builder[1].delete(builder[1].length() - 2, builder[1].length()).toString()
+                methodHandler.useDefault() ? builder[1].toString() : builder[1].delete(builder[1].length() - 2, builder[1].length()).toString()
         };
     }
 
     private String[] buildInsertAllStatement() {
-        StringBuilder[] builder = new StringBuilder[] {new StringBuilder(), new StringBuilder()};
-        Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
-        for (String field : fieldMap.keySet()) {
-            builder[0].append(CommonUtil.convert2Underline(field, true)).append(", ");
-            builder[1].append("#{item.").append(field).append("}, ");
-        }
-        return new String[] {
-                builder[0].delete(builder[0].length() - 2, builder[0].length()).toString(),
-                builder[1].delete(builder[1].length() - 2, builder[1].length()).toString()
-        };
+        return buildInsertStatement("item");
     }
 
-    private String buildUpdateStatement() {
+    private String buildUpdateStatement(String entity) {
         StringBuilder builder = new StringBuilder();
-        String entity = methodHandler.getQueryParameters().get(0);
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
         for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
             builder.append("<if test=\"");
@@ -182,19 +195,7 @@ public class MapperHandler {
     }
 
     private String buildUpdateAllStatement() {
-        StringBuilder builder = new StringBuilder();
-        Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
-        for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
-            builder.append("<if test=\"");
-            builder.append("item.").append(entry.getKey()).append(" != null ");
-            if(String.class.isAssignableFrom(entry.getValue().getType())) {
-                builder.append(" and ").append("item.").append(entry.getKey()).append(" != '' ");
-            }
-            builder.append("\">");
-            builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{item.").append(entry.getKey()).append("}, ");
-            builder.append("</if>");
-        }
-        return builder.toString();
+        return buildUpdateStatement("item");
     }
 
     private String buildCondition() {
