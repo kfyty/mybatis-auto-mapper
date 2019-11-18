@@ -16,7 +16,7 @@
         &lt;set&gt;
             %s
         &lt;/set&gt;
-        where %s = %s
+        where ( %s )
     </update>
 
     <update id="updateAll" parameterType="%s">
@@ -25,8 +25,12 @@
             &lt;set&gt;
                 %s
             &lt;/set&gt;
-            where %s = %s
+            where ( %s )
         </foreach>
+    </update>
+
+    <update id="updateBy">
+        update %s set ( %s ) where ( %s )
     </update>
 
     <select id="findBy" resultType="%s">
@@ -36,7 +40,6 @@
     <select id="findAll" resultType="%s">
         select %s from %s
     </select>
-
 
     <select id="pageBy" resultType="%s">
         select %s from %s where ( %s )

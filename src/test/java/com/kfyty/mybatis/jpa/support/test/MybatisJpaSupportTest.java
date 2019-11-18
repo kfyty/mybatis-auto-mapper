@@ -58,8 +58,21 @@ public class MybatisJpaSupportTest {
      * @param objs
      * @return
      */
-    @JpaQuery(primaryKey = "id")
+    @JpaQuery(primaryKey = {"id", "code"})
     public int updateAllMybatisJpaSupportTest(@Param("objs") List<MybatisJpaSupportTest> objs) {
+        return 0;
+    }
+
+    /**
+     * updateBy 中必须包含 Set, 且用 And 分隔 Set 之后的字段
+     * @param code
+     * @param name
+     * @param createTime
+     * @param updateTime
+     * @return
+     */
+    @JpaQuery
+    public int updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime(@Param("code") String code, @Param("name") String name, @Param("age") Integer age, @Param("createTime") Date createTime, @Param("updateTime") Date updateTime) {
         return 0;
     }
 
@@ -166,6 +179,9 @@ public class MybatisJpaSupportTest {
         System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
 
         methodHandler = new MethodHandler(this.getMethod("updateAllMybatisJpaSupportTest", List.class), null);
+        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+
+        methodHandler = new MethodHandler(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class), null);
         System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
 
         methodHandler = new MethodHandler(this.getMethod("findById", Integer.class), null);

@@ -13,10 +13,7 @@ import java.util.Objects;
  * @since JDK 1.8
  */
 public enum SQLOperateEnum {
-    OPERATE_INSERT_ALL("insertAll", ""),
-    OPERATE_UPDATE_ALL("updateAll", ""),
-    OPERATE_INSERT("insert", ""),
-    OPERATE_UPDATE("update", ""),
+    OPERATE_UPDATE_BY("updateBy", ""),
     OPERATE_SELECT_BY("findBy", ""),
     OPERATE_SELECT_ALL("findAll", ""),
     OPERATE_PAGE_BY("pageBy", ""),
@@ -24,7 +21,11 @@ public enum SQLOperateEnum {
     OPERATE_DELETE_BY("deleteBy", ""),
     OPERATE_DELETE_ALL("deleteAll", ""),
     OPERATE_COUNT_BY("countBy", ""),
-    OPERATE_COUNT_All("countAll", "");
+    OPERATE_COUNT_All("countAll", ""),
+    OPERATE_INSERT_ALL("insertAll", ""),
+    OPERATE_UPDATE_ALL("updateAll", ""),
+    OPERATE_INSERT("insert", ""),
+    OPERATE_UPDATE("update", "");
 
     static {
         XPathParser xPathParser = new XPathParser(new InputStreamReader(SQLOperateEnum.class.getResourceAsStream("/mapper-template.xml")));

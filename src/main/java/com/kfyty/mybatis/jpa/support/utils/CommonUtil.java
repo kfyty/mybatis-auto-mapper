@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -51,6 +52,10 @@ public class CommonUtil {
             return ((Map) obj).size();
         }
         return 1;
+    }
+
+    public static List<String> split(String source, String regex) {
+        return Arrays.stream(source.split(regex)).filter(e -> !empty(e)).collect(Collectors.toList());
     }
 
     public static String convert2Hump(String s, boolean isClass) {

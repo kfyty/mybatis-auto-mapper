@@ -19,7 +19,7 @@ public @interface JpaQuery {
      * 更新时指定主键属性
      * @return
      */
-    String primaryKey() default "id";
+    String[] primaryKey() default "id";
 
     /**
      * 实体类后缀

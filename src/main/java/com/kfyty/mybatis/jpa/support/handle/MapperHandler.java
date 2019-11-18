@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * 功能描述: Mapper 处理器，得到 Mapper 标签
@@ -107,13 +106,16 @@ public class MapperHandler {
 
     private void operateUpdate() {
         String entity = methodHandler.getQueryParameters().get(0);
-        String primaryKey = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
-        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), this.buildUpdateStatement(entity), primaryKey, "#{" + entity + "." + primaryKey + "}");
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), this.getTable(), this.buildUpdateStatement(entity), this.buildUpdatePrimaryKeyCondition(entity));
     }
 
     private void operateUpdateAll() {
-        String primaryKey = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
-        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), methodHandler.getQueryParameters().get(0), this.getTable(), this.buildUpdateAllStatement(), primaryKey, "#{item." + primaryKey + "}");
+        this.xml = String.format(this.getMapperXmlTemplate(), methodHandler.getParameterType().getName(), methodHandler.getQueryParameters().get(0), this.getTable(), this.buildUpdateAllStatement(), this.buildUpdatePrimaryKeyCondition("item"));
+    }
+
+    private void operateUpdateBy() {
+        String[] condition = this.buildUpdateCondition();
+        this.xml = String.format(this.getMapperXmlTemplate(), this.getTable(), condition[0], condition[1]);
     }
 
     private void operateSelectBy() {
@@ -178,6 +180,18 @@ public class MapperHandler {
         return buildInsertStatement("item");
     }
 
+    private String buildUpdatePrimaryKeyCondition(String entity) {
+        StringBuilder builder = new StringBuilder();
+        String[] primaryKeys = methodHandler.getMethod().getAnnotation(JpaQuery.class).primaryKey();
+        for (int i = 0; i < primaryKeys.length; i++) {
+            builder.append(primaryKeys[i]).append(" = #{").append(entity).append(".").append(CommonUtil.convert2Hump(primaryKeys[i], false)).append("}");
+            if(i != primaryKeys.length - 1) {
+                builder.append(" and ");
+            }
+        }
+        return builder.toString();
+    }
+
     private String buildUpdateStatement(String entity) {
         StringBuilder builder = new StringBuilder();
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(methodHandler.getParameterType());
@@ -198,12 +212,36 @@ public class MapperHandler {
         return buildUpdateStatement("item");
     }
 
-    private String buildCondition() {
+    private String[] buildUpdateCondition() {
         StringBuilder builder = new StringBuilder();
-        String methodName = methodHandler.getMethod().getName().replace(operateEnum.operate(), "");
-        Matcher matcher = Pattern.compile("OrderBy|And|Or").matcher(methodName);
+        List<String> queryParameters = methodHandler.getQueryParameters();
+        List<String> updateConditions = CommonUtil.split(methodHandler.getMethod().getName().replaceFirst(operateEnum.operate(), ""), "Set");
+        if(updateConditions.size() != 2) {
+            throw new IllegalArgumentException("build sql error: cannot parse condition and set statement !");
+        }
+        List<String> conditions = CommonUtil.split(updateConditions.get(1), "And");
+        int index = queryParameters.size() - conditions.size();
+        for(int i = 0; i < conditions.size(); i++) {
+            builder.append(CommonUtil.convert2Underline(conditions.get(i), true)).append(" = #{").append(queryParameters.get(i + index)).append("}");
+            if(i != conditions.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        return new String[] {
+                builder.toString(),
+                this.buildCondition(updateConditions.get(0))
+        };
+    }
+
+    private String buildCondition() {
+        return this.buildCondition(methodHandler.getMethod().getName().replaceFirst(operateEnum.operate(), ""));
+    }
+
+    private String buildCondition(String conditionString) {
+        StringBuilder builder = new StringBuilder();
+        Matcher matcher = Pattern.compile("OrderBy|And|Or").matcher(conditionString);
         List<String> queryParameters = this.methodHandler.getQueryParameters();
-        List<String> conditions = Arrays.stream(methodName.split("OrderBy|And|Or")).filter(e -> !e.isEmpty()).collect(Collectors.toList());
+        List<String> conditions = CommonUtil.split(conditionString, "OrderBy|And|Or");
         for (int i = 0; i < conditions.size(); i++) {
             if(conditions.get(i).contains("Asc") || conditions.get(i).contains("Desc")) {
                 if(matcher.find()) {
@@ -262,7 +300,7 @@ public class MapperHandler {
 
     private String buildConditionOfOrderBy(String column) {
         StringBuilder builder = new StringBuilder();
-        List<String> conditions = Arrays.stream(column.split("Asc|Desc")).filter(e -> !e.isEmpty()).collect(Collectors.toList());
+        List<String> conditions = CommonUtil.split(column, "Asc|Desc");
         builder.append(" order by ");
         for (int i = 0; i < conditions.size(); i++) {
             column = column.replaceFirst(conditions.get(i), "");
