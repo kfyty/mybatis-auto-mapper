@@ -1,8 +1,7 @@
 package com.kfyty.mybatis.jpa.support.proxy;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
+import com.kfyty.mybatis.jpa.support.annotation.Pageable;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.lang.reflect.InvocationHandler;
@@ -35,10 +34,7 @@ public class MybatisPageHelperProxyFactoryBean implements InvocationHandler, Fac
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if(Page.class.isAssignableFrom(method.getReturnType()) && verifyPageParameters(args)) {
-            return PageHelper.startPage((int) args[args.length - 2], (int) args[args.length - 1]).doSelectPage(() -> this.invoke(method, args));
-        }
-        if((method.getName().startsWith(SQLOperateEnum.OPERATE_PAGE_BY.operate()) || method.getName().startsWith(SQLOperateEnum.OPERATE_PAGE_ALL.operate())) && verifyPageParameters(args)) {
+        if(method.isAnnotationPresent(Pageable.class) && verifyPageParameters(args)) {
             return PageHelper.startPage((int) args[args.length - 2], (int) args[args.length - 1]).doSelectPage(() -> this.invoke(method, args));
         }
         return this.invoke(method, args);

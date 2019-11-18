@@ -1,6 +1,7 @@
 package com.kfyty.mybatis.jpa.support.test;
 
 import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
+import com.kfyty.mybatis.jpa.support.annotation.Pageable;
 import com.kfyty.mybatis.jpa.support.handle.MapperHandler;
 import com.kfyty.mybatis.jpa.support.handle.MethodHandler;
 import org.apache.ibatis.annotations.MapKey;
@@ -135,16 +136,18 @@ public class MybatisJpaSupportTest {
     }
 
     /**
-     * 返回值为 Page<E> 或 pageBy/pageAll 开头的方法自动分页
+     * 使用注解 @Pageable 且方法参数最后两参数应依次为 pageNum, pageSize 时进行分页
      * 返回值泛型须存在
-     * 方法参数最后两参数应依次为 pageNum, pageSize
      * 若需要返回 PageInfo 需自行转换
+     * 若不使用 @Pageable 注解，请阅读 mybatis-helper 使用文档
+     * pageBy/pageAll 仅做与 findBy/findAll 区分之用
      * @param sid
      * @param eid
      * @param ids
      * @return
      */
     @JpaQuery
+    @Pageable
     public List<MybatisJpaSupportTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
         return null;
     }
