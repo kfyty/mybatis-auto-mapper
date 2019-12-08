@@ -30,11 +30,11 @@
     </update>
 
     <update id="updateBy">
-        update %s set ( %s ) where ( %s )
+        update %s set %s where ( %s )
     </update>
 
     <select id="findBy" resultType="%s">
-        select %s from %s where ( %s )
+        select %s from %s where %s
     </select>
 
     <select id="findAll" resultType="%s">
@@ -42,7 +42,7 @@
     </select>
 
     <select id="pageBy" resultType="%s">
-        select %s from %s where ( %s )
+        select %s from %s where %s
     </select>
 
     <select id="pageAll" resultType="%s">
@@ -58,7 +58,7 @@
     </delete>
 
     <select id="countBy" resultType="%s">
-        select %s from %s where ( %s )
+        select %s from %s where %s
     </select>
 
     <select id="countAll" resultType="%s">
