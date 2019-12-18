@@ -1,9 +1,9 @@
 package com.kfyty.mybatis.jpa.support.test;
 
-import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
+import com.kfyty.mybatis.jpa.support.annotation.AutoMapper;
 import com.kfyty.mybatis.jpa.support.annotation.Pageable;
+import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.jpa.support.handle.MapperHandler;
-import com.kfyty.mybatis.jpa.support.handle.MethodHandler;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import java.util.Map;
  * @date 2019/11/13 19:02
  * @since JDK 1.8
  */
+@AutoMapper(where = "DELETE = 0")
 public class MybatisJpaSupportTest {
     private Integer id;
     private String name;
@@ -34,31 +35,32 @@ public class MybatisJpaSupportTest {
     }
 
     /**
-     * 需要解析的方法需要添加 @JpaQuery 注解
+     * 需要解析的方法需要添加 @AutoMapper 注解
      * @param obj
      * @return
      */
-    @JpaQuery
+    @AutoMapper
     public int insertMybatisJpaSupportTest(@Param("obj") MybatisJpaSupportTest obj) {
         return 0;
     }
 
-    @JpaQuery
+    @AutoMapper
     public int insertAllMybatisJpaSupportTest(@Param("objs") List<MybatisJpaSupportTest> objs) {
         return 0;
     }
 
-    @JpaQuery
+    @AutoMapper(where = "PARENT_ID = 0", separator = "or")
     public int updateMybatisJpaSupportTest(@Param("obj") MybatisJpaSupportTest obj) {
         return 0;
     }
 
     /**
      * primaryKey: 更新时指定主键属性，默认为 id
+     * separator: 分隔符设置为 "" 时，类注解 where() 失效
      * @param objs
      * @return
      */
-    @JpaQuery(primaryKey = {"id", "code"})
+    @AutoMapper(primaryKey = {"id", "code"}, separator = "")
     public int updateAllMybatisJpaSupportTest(@Param("objs") List<MybatisJpaSupportTest> objs) {
         return 0;
     }
@@ -71,28 +73,28 @@ public class MybatisJpaSupportTest {
      * @param updateTime
      * @return
      */
-    @JpaQuery
+    @AutoMapper
     public int updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime(@Param("code") String code, @Param("name") String name, @Param("age") Integer age, @Param("createTime") Date createTime, @Param("updateTime") Date updateTime) {
         return 0;
     }
 
-    @JpaQuery
+    @AutoMapper
     public MybatisJpaSupportTest findById(@Param("id") Integer id) {
         return null;
     }
 
-    @JpaQuery
+    @AutoMapper
     public MybatisJpaSupportTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime) {
         return null;
     }
 
-    @JpaQuery
+    @AutoMapper
     public MybatisJpaSupportTest findByIdEqualAndNameNotNull(@Param("id") Integer id, @Param("name") String name) {
         return null;
     }
 
-    @JpaQuery
-    public MybatisJpaSupportTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, @Param("name") String name, @Param("start") Date start, @Param("end") Date end) {
+    @AutoMapper
+    public MybatisJpaSupportTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end) {
         return null;
     }
 
@@ -103,7 +105,7 @@ public class MybatisJpaSupportTest {
      * @param ids
      * @return
      */
-    @JpaQuery
+    @AutoMapper
     public MybatisJpaSupportTest findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids) {
         return null;
     }
@@ -112,7 +114,7 @@ public class MybatisJpaSupportTest {
      * columns: 自定义查询列
      * @return
      */
-    @JpaQuery(columns = "distinct name")
+    @AutoMapper(columns = "distinct name")
     public List<String> findAllName() {
         return null;
     }
@@ -121,7 +123,7 @@ public class MybatisJpaSupportTest {
      * table: 当返回值/方法参数/Mapper接口无法解析出表名时，需以此指定
      * @return
      */
-    @JpaQuery(columns = "distinct name", table = "mybatis_jpa_support_test")
+    @AutoMapper(columns = "distinct name", table = "mybatis_jpa_support_test")
     public List<String> findByNameNotNull() {
         return null;
     }
@@ -132,7 +134,7 @@ public class MybatisJpaSupportTest {
      * @param id
      * @return
      */
-    @JpaQuery
+    @AutoMapper
     public int countById(@Param("id") Integer id) {
         return 0;
     }
@@ -142,7 +144,7 @@ public class MybatisJpaSupportTest {
      * @param id
      * @return
      */
-    @JpaQuery
+    @AutoMapper
     @MapKey("id")
     public Map<Integer, MybatisJpaSupportTest> findByIdNotIn(@Param("ids") List<Integer> id) {
         return null;
@@ -159,59 +161,59 @@ public class MybatisJpaSupportTest {
      * @param ids
      * @return
      */
-    @JpaQuery
     @Pageable
+    @AutoMapper
     public List<MybatisJpaSupportTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
         return null;
     }
 
     @Test
     public void test() {
-        MethodHandler methodHandler = null;
+        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration();
 
-        methodHandler = new MethodHandler(this.getMethod("insertMybatisJpaSupportTest", MybatisJpaSupportTest.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertMybatisJpaSupportTest", MybatisJpaSupportTest.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("insertAllMybatisJpaSupportTest", List.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertAllMybatisJpaSupportTest", List.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("updateMybatisJpaSupportTest", MybatisJpaSupportTest.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateMybatisJpaSupportTest", MybatisJpaSupportTest.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("updateAllMybatisJpaSupportTest", List.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateAllMybatisJpaSupportTest", List.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findById", Integer.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findById", Integer.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findAllName"), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllName"));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByNameNotNull"), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByNameNotNull"));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("findByIdNotIn", List.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdNotIn", List.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("countById", Integer.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("countById", Integer.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        methodHandler = new MethodHandler(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class), null);
-        System.out.println(new MapperHandler(methodHandler).parse().getMapperXml());
+        mapperMethodConfiguration.initConfiguration(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
     }
 }

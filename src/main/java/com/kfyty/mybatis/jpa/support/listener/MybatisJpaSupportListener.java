@@ -1,7 +1,7 @@
 package com.kfyty.mybatis.jpa.support.listener;
 
 import com.github.pagehelper.PageInterceptor;
-import com.kfyty.mybatis.jpa.support.annotation.JpaQuery;
+import com.kfyty.mybatis.jpa.support.annotation.AutoMapper;
 import com.kfyty.mybatis.jpa.support.handle.MethodHandler;
 import com.kfyty.mybatis.jpa.support.proxy.MybatisPageHelperProxyFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
@@ -39,7 +39,7 @@ public class MybatisJpaSupportListener implements ApplicationListener<ContextRef
         Configuration configuration = applicationContext.getBean(SqlSessionTemplate.class).getConfiguration();
         for (Map.Entry<String, Object> entry : mapperMap.entrySet()) {
             Method[] methods = entry.getValue().getClass().getInterfaces()[0].getMethods();
-            Arrays.stream(methods).filter(e -> e.isAnnotationPresent(JpaQuery.class)).forEach(e -> new MethodHandler(e, configuration).parse());
+            Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> new MethodHandler(e, configuration).parse());
             BeanDefinitionBuilder beanFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisPageHelperProxyFactoryBean.class);
             beanFactoryDefinitionBuilder.addConstructorArgValue(entry.getValue());
             beanFactory.removeBeanDefinition(entry.getKey());

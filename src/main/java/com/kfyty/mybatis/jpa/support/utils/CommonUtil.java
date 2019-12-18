@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,18 @@ public class CommonUtil {
 
     public static boolean empty(Map m) {
         return !Optional.ofNullable(m).filter(e -> !e.isEmpty()).isPresent();
+    }
+
+    public static boolean baseType(Class<?> clazz) {
+        return byte.class.isAssignableFrom(clazz)           ||
+                short.class.isAssignableFrom(clazz)         ||
+                int.class.isAssignableFrom(clazz)           ||
+                long.class.isAssignableFrom(clazz)          ||
+                float.class.isAssignableFrom(clazz)         ||
+                double.class.isAssignableFrom(clazz)        ||
+                Number.class.isAssignableFrom(clazz)        ||
+                CharSequence.class.isAssignableFrom(clazz)  ||
+                Date.class.isAssignableFrom(clazz);
     }
 
     public static int size(Object obj) {
