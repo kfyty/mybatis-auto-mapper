@@ -1,6 +1,6 @@
-package com.kfyty.mybatis.jpa.support.strategy;
+package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 
 /**
  * 功能描述: 生成 <select/> 标签策略
@@ -9,7 +9,7 @@ import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
-public class SelectMapperLabelStrategy extends GenerateMapperLabel {
+public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     public SelectMapperLabelStrategy(MapperMethodConfiguration mapperMethodConfiguration) {
         super(mapperMethodConfiguration);

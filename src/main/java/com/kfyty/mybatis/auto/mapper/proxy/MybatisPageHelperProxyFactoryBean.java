@@ -1,7 +1,7 @@
-package com.kfyty.mybatis.jpa.support.proxy;
+package com.kfyty.mybatis.auto.mapper.proxy;
 
 import com.github.pagehelper.PageHelper;
-import com.kfyty.mybatis.jpa.support.annotation.Pageable;
+import com.kfyty.mybatis.auto.mapper.annotation.Pageable;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.lang.reflect.InvocationHandler;

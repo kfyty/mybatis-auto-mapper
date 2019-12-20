@@ -1,4 +1,4 @@
-package com.kfyty.mybatis.jpa.support.match;
+package com.kfyty.mybatis.auto.mapper.match;
 
 import java.util.HashSet;
 import java.util.Objects;

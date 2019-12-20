@@ -1,8 +1,8 @@
-package com.kfyty.mybatis.jpa.support.configure;
+package com.kfyty.mybatis.auto.mapper.configure;
 
-import com.kfyty.mybatis.jpa.support.annotation.AutoMapper;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
-import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
+import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -216,7 +216,7 @@ public class MapperMethodConfiguration {
             this.table = CommonUtil.convert2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""), true);
             return ;
         }
-        this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper|Dao", ""), true);
+        this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""), true);
     }
 
     private String getSeparator(AutoMapper autoMapper) {

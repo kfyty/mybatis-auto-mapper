@@ -6,14 +6,14 @@ mybatis 扩展包，只需引入该依赖，不需任何附加配置，就可拥
 (这真是一个简单的不能再简单的项目了...  注意哦，没有 Mapper.xml 文件 ！！！)
 ![image](image/project-struct.PNG)
 
-重要依赖如下，第一个就是本项目了：
+重要依赖如下，第一个就是本项目了(最新版本 artifactId 已更新为 mybatis-auto-mapper)：
 ![image](image/pom.PNG)
 
 实体类：
 ![image](image/po.PNG)
 
 Mapper 接口：
-(注意：由于没有 Mapper.xml 文件，所以需要也只需要添加 @JpaQuery 注解，这样就能生成 sql 语句并执行了，且这种解析在整个过程中只会解析一次！)
+(注意：由于没有 Mapper.xml 文件，所以需要也只需要添加 @JpaQuery(最新版本已更新为 @AutoMapper 注解) 注解，这样就能生成 sql 语句并执行了，且这种解析在整个过程中只会解析一次！)
 ![image](image/mapper.PNG)
 
 启动类：
@@ -32,4 +32,4 @@ Mapper 接口：
 
 有兴趣的可以 clone 试试哦！
 
-PS：更多语法请参照项目中的 SQLConditionEnum.java 文件(目前第一版除In/NotIn 外，其他条件解析已实现)
+PS：更多语法请参照项目中的 SQLConditionEnum.java 文件(编写方法实例请参照 MybatisAutoMapperTest.java 文件)

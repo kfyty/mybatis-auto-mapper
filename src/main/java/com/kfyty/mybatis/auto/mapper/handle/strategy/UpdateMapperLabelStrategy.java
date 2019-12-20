@@ -1,8 +1,8 @@
-package com.kfyty.mybatis.jpa.support.strategy;
+package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
-import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
-public class UpdateMapperLabelStrategy extends GenerateMapperLabel {
+public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     public UpdateMapperLabelStrategy(MapperMethodConfiguration mapperMethodConfiguration) {
         super(mapperMethodConfiguration);

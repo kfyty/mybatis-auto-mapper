@@ -1,12 +1,12 @@
-package com.kfyty.mybatis.jpa.support.handle;
+package com.kfyty.mybatis.auto.mapper.handle;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
-import com.kfyty.mybatis.jpa.support.strategy.DeleteMapperLabelStrategy;
-import com.kfyty.mybatis.jpa.support.strategy.GenerateMapperLabel;
-import com.kfyty.mybatis.jpa.support.strategy.InsertMapperLabelStrategy;
-import com.kfyty.mybatis.jpa.support.strategy.SelectMapperLabelStrategy;
-import com.kfyty.mybatis.jpa.support.strategy.UpdateMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.DeleteMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.AbstractGenerateMapperLabel;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.InsertMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.SelectMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
 import lombok.Getter;
 
 /**
@@ -20,7 +20,7 @@ public class MapperHandler {
     @Getter
     private String mapperXmlLabel;
     private SQLOperateEnum operateEnum;
-    private GenerateMapperLabel generateMapperLabel;
+    private AbstractGenerateMapperLabel generateMapperLabel;
     private MapperMethodConfiguration mapperMethodConfiguration;
 
     public MapperHandler(MapperMethodConfiguration mapperMethodConfiguration) {
@@ -29,7 +29,7 @@ public class MapperHandler {
     }
 
     public MapperHandler parse() {
-        this.determine();
+        this.determineStrategy();
         this.generateMapperLabel.generateMapperLabel();
         return this;
     }
@@ -38,7 +38,7 @@ public class MapperHandler {
         return this.generateMapperLabel.getMapperLabel();
     }
 
-    private void determine() {
+    private void determineStrategy() {
         if(operateEnum.name().contains("INSERT")) {
             this.mapperXmlLabel = "/insert";
             this.generateMapperLabel = new InsertMapperLabelStrategy(mapperMethodConfiguration);

@@ -1,4 +1,4 @@
-package com.kfyty.mybatis.jpa.support.utils;
+package com.kfyty.mybatis.auto.mapper.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

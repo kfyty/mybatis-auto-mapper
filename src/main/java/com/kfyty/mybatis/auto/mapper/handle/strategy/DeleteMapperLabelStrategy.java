@@ -1,7 +1,7 @@
-package com.kfyty.mybatis.jpa.support.strategy;
+package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 
 /**
  * 功能描述: 生成 <delete/> 标签策略
@@ -10,7 +10,7 @@ import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
-public class DeleteMapperLabelStrategy extends GenerateMapperLabel {
+public class DeleteMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     public DeleteMapperLabelStrategy(MapperMethodConfiguration mapperMethodConfiguration) {
         super(mapperMethodConfiguration);

@@ -1,9 +1,9 @@
-package com.kfyty.mybatis.jpa.support.listener;
+package com.kfyty.mybatis.auto.mapper.listener;
 
 import com.github.pagehelper.PageInterceptor;
-import com.kfyty.mybatis.jpa.support.annotation.AutoMapper;
-import com.kfyty.mybatis.jpa.support.handle.MethodHandler;
-import com.kfyty.mybatis.jpa.support.proxy.MybatisPageHelperProxyFactoryBean;
+import com.kfyty.mybatis.auto.mapper.handle.MethodHandler;
+import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.proxy.MybatisPageHelperProxyFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
@@ -25,7 +25,7 @@ import java.util.Map;
  * @date 2019/11/6 11:06
  * @since JDK 1.8
  */
-public class MybatisJpaSupportListener implements ApplicationListener<ContextRefreshedEvent> {
+public class MybatisAutoMapperListener implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent applicationEvent) {

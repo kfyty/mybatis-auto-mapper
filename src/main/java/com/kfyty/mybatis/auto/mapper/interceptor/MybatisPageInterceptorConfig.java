@@ -1,4 +1,4 @@
-package com.kfyty.mybatis.jpa.support.interceptor;
+package com.kfyty.mybatis.auto.mapper.interceptor;
 
 import com.github.pagehelper.PageInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

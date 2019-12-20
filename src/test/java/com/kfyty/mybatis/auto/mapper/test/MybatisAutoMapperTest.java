@@ -1,9 +1,9 @@
-package com.kfyty.mybatis.jpa.support.test;
+package com.kfyty.mybatis.auto.mapper.test;
 
-import com.kfyty.mybatis.jpa.support.annotation.AutoMapper;
-import com.kfyty.mybatis.jpa.support.annotation.Pageable;
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.jpa.support.handle.MapperHandler;
+import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.annotation.Pageable;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.handle.MapperHandler;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ import java.util.Map;
  * @since JDK 1.8
  */
 @AutoMapper(where = "DELETE = 0")
-public class MybatisJpaSupportTest {
+public class MybatisAutoMapperTest {
     private Integer id;
     private String name;
     private Date createTime;
 
     private Method getMethod(String name, Class<?> ... classes) {
         try {
-            return MybatisJpaSupportTest.class.getDeclaredMethod(name, classes);
+            return MybatisAutoMapperTest.class.getDeclaredMethod(name, classes);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -40,17 +40,17 @@ public class MybatisJpaSupportTest {
      * @return
      */
     @AutoMapper
-    public int insertMybatisJpaSupportTest(@Param("obj") MybatisJpaSupportTest obj) {
+    public int insertMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
         return 0;
     }
 
     @AutoMapper
-    public int insertAllMybatisJpaSupportTest(@Param("objs") List<MybatisJpaSupportTest> objs) {
+    public int insertAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
         return 0;
     }
 
     @AutoMapper(where = "PARENT_ID = 0", separator = "or")
-    public int updateMybatisJpaSupportTest(@Param("obj") MybatisJpaSupportTest obj) {
+    public int updateMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
         return 0;
     }
 
@@ -61,7 +61,7 @@ public class MybatisJpaSupportTest {
      * @return
      */
     @AutoMapper(primaryKey = {"id", "code"}, separator = "")
-    public int updateAllMybatisJpaSupportTest(@Param("objs") List<MybatisJpaSupportTest> objs) {
+    public int updateAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
         return 0;
     }
 
@@ -79,22 +79,22 @@ public class MybatisJpaSupportTest {
     }
 
     @AutoMapper
-    public MybatisJpaSupportTest findById(@Param("id") Integer id) {
+    public MybatisAutoMapperTest findById(@Param("id") Integer id) {
         return null;
     }
 
     @AutoMapper
-    public MybatisJpaSupportTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime) {
+    public MybatisAutoMapperTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime) {
         return null;
     }
 
     @AutoMapper
-    public MybatisJpaSupportTest findByIdEqualAndNameNotNull(@Param("id") Integer id, @Param("name") String name) {
+    public MybatisAutoMapperTest findByIdEqualAndNameNotNull(@Param("id") Integer id, @Param("name") String name) {
         return null;
     }
 
     @AutoMapper
-    public MybatisJpaSupportTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end) {
+    public MybatisAutoMapperTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end) {
         return null;
     }
 
@@ -106,7 +106,7 @@ public class MybatisJpaSupportTest {
      * @return
      */
     @AutoMapper
-    public MybatisJpaSupportTest findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids) {
+    public MybatisAutoMapperTest findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids) {
         return null;
     }
 
@@ -146,7 +146,7 @@ public class MybatisJpaSupportTest {
      */
     @AutoMapper
     @MapKey("id")
-    public Map<Integer, MybatisJpaSupportTest> findByIdNotIn(@Param("ids") List<Integer> id) {
+    public Map<Integer, MybatisAutoMapperTest> findByIdNotIn(@Param("ids") List<Integer> id) {
         return null;
     }
 
@@ -163,7 +163,7 @@ public class MybatisJpaSupportTest {
      */
     @Pageable
     @AutoMapper
-    public List<MybatisJpaSupportTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
+    public List<MybatisAutoMapperTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
         return null;
     }
 
@@ -171,16 +171,16 @@ public class MybatisJpaSupportTest {
     public void test() {
         MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration();
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("insertMybatisJpaSupportTest", MybatisJpaSupportTest.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertMybatisAutoMapperTest", MybatisAutoMapperTest.class));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("insertAllMybatisJpaSupportTest", List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertAllMybatisAutoMapperTest", List.class));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("updateMybatisJpaSupportTest", MybatisJpaSupportTest.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateMybatisAutoMapperTest", MybatisAutoMapperTest.class));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("updateAllMybatisJpaSupportTest", List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateAllMybatisAutoMapperTest", List.class));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class));

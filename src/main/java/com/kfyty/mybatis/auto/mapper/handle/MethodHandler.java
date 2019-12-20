@@ -1,6 +1,6 @@
-package com.kfyty.mybatis.jpa.support.handle;
+package com.kfyty.mybatis.auto.mapper.handle;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;

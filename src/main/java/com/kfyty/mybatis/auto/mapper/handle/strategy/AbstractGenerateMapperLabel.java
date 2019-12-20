@@ -1,9 +1,9 @@
-package com.kfyty.mybatis.jpa.support.strategy;
+package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.jpa.support.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.jpa.support.match.SQLConditionEnum;
-import com.kfyty.mybatis.jpa.support.match.SQLOperateEnum;
-import com.kfyty.mybatis.jpa.support.utils.CommonUtil;
+import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
-public abstract class GenerateMapperLabel {
+public abstract class AbstractGenerateMapperLabel {
     protected String xml;
     protected String table;
     protected String where;
@@ -27,7 +27,7 @@ public abstract class GenerateMapperLabel {
     protected List<String> queryParameters;
     protected MapperMethodConfiguration mapperMethodConfiguration;
 
-    public GenerateMapperLabel(MapperMethodConfiguration mapperMethodConfiguration) {
+    public AbstractGenerateMapperLabel(MapperMethodConfiguration mapperMethodConfiguration) {
         this.table = mapperMethodConfiguration.getTable();
         this.where = mapperMethodConfiguration.getWhere();
         this.operateEnum = mapperMethodConfiguration.getOperateEnum();

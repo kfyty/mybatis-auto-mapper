@@ -1,1 +1,1 @@
-org.springframework.context.ApplicationListener=com.kfyty.mybatis.jpa.support.listener.MybatisJpaSupportListener
+org.springframework.context.ApplicationListener=com.kfyty.mybatis.auto.mapper.listener.MybatisAutoMapperListener

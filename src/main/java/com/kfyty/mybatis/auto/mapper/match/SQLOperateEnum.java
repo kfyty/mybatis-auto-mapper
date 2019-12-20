@@ -1,4 +1,4 @@
-package com.kfyty.mybatis.jpa.support.match;
+package com.kfyty.mybatis.auto.mapper.match;
 
 import org.apache.ibatis.parsing.XPathParser;
 
