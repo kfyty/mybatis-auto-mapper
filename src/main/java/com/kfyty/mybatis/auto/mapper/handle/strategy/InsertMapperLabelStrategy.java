@@ -1,5 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
+import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
@@ -33,12 +34,26 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     private void operateInsert() {
         String[] insertStatement = this.buildInsertStatement(queryParameters.get(0));
-        this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.table, insertStatement[0], insertStatement[1]);
+        this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.buildSelectKey(), this.table, insertStatement[0], insertStatement[1]);
     }
 
     private void operateInsertAll() {
         String[] insertStatement = this.buildInsertAllStatement();
         this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.table, insertStatement[0], queryParameters.get(0), insertStatement[1]);
+    }
+
+    private String buildSelectKey() {
+        if(mapperMethodConfiguration.getSelectKey() == null) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        SelectKey selectKey = mapperMethodConfiguration.getSelectKey();
+        String primaryKey = mapperMethodConfiguration.getPrimaryKey()[0];
+        String primaryKeyType = CommonUtil.getField(mapperMethodConfiguration.getParameterType(), primaryKey).getType().getName();
+        builder.append("<selectKey keyProperty=\"").append(primaryKey).append("\" resultType=\"").append(primaryKeyType).append("\" order=\"").append(selectKey.order()).append("\">");
+        builder.append(selectKey.value());
+        builder.append("</selectKey>");
+        return builder.toString();
     }
 
     private String[] buildInsertStatement(String entity) {

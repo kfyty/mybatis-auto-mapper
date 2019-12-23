@@ -1,6 +1,7 @@
 package com.kfyty.mybatis.auto.mapper.configure;
 
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 import lombok.Getter;
@@ -65,6 +66,9 @@ public class MapperMethodConfiguration {
     @Getter
     private SQLOperateEnum operateEnum;
 
+    @Getter
+    private SelectKey selectKey;
+
     private AutoMapper classAnnotation;
 
     private AutoMapper methodAnnotation;
@@ -88,6 +92,7 @@ public class MapperMethodConfiguration {
         this.initColumns();
         this.initUseDefault();
         this.initTable();
+        this.initSelectKey();
         return this;
     }
 
@@ -170,13 +175,16 @@ public class MapperMethodConfiguration {
 
     private void initWhere() {
         this.where = "";
+        if(!methodAnnotation.extend()) {
+            if(!CommonUtil.empty(methodAnnotation.where())) {
+                this.where = getSeparator(methodAnnotation) + methodAnnotation.where();
+            }
+            return;
+        }
         if(classAnnotation == null && CommonUtil.empty(methodAnnotation.where())) {
             return ;
         }
         if(classAnnotation != null && CommonUtil.empty(classAnnotation.where()) && CommonUtil.empty(methodAnnotation.where())) {
-            return ;
-        }
-        if(classAnnotation != null && !CommonUtil.empty(classAnnotation.where()) && CommonUtil.empty(methodAnnotation.separator())) {
             return ;
         }
         if(!CommonUtil.empty(methodAnnotation.where())) {
@@ -189,6 +197,9 @@ public class MapperMethodConfiguration {
 
     private void initColumns() {
         this.columns = methodAnnotation.columns();
+        if(CommonUtil.empty(this.columns)) {
+            this.columns = "*";
+        }
     }
 
     private void initUseDefault() {
@@ -217,6 +228,13 @@ public class MapperMethodConfiguration {
             return ;
         }
         this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""), true);
+    }
+
+    private void initSelectKey() {
+        this.selectKey = mapperInterface.getAnnotation(SelectKey.class);
+        if(mapperMethod.isAnnotationPresent(SelectKey.class)) {
+            this.selectKey = mapperMethod.getAnnotation(SelectKey.class);
+        }
     }
 
     private String getSeparator(AutoMapper autoMapper) {

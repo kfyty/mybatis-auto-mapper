@@ -2,6 +2,7 @@ package com.kfyty.mybatis.auto.mapper.test;
 
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.Pageable;
+import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.handle.MapperHandler;
 import org.apache.ibatis.annotations.MapKey;
@@ -36,9 +37,11 @@ public class MybatisAutoMapperTest {
 
     /**
      * 需要解析的方法需要添加 @AutoMapper 注解
+     * 需要获取主键需要添加 @SelectKey 注解，默认提供 MySQL 实现
      * @param obj
      * @return
      */
+    @SelectKey
     @AutoMapper
     public int insertMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
         return 0;
@@ -56,11 +59,11 @@ public class MybatisAutoMapperTest {
 
     /**
      * primaryKey: 更新时指定主键属性，默认为 id
-     * separator: 分隔符设置为 "" 时，类注解 where() 失效
+     * extend: 设为 false 时，类注解 where() 失效
      * @param objs
      * @return
      */
-    @AutoMapper(primaryKey = {"id", "code"}, separator = "")
+    @AutoMapper(primaryKey = {"id", "code"}, extend = false)
     public int updateAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
         return 0;
     }
