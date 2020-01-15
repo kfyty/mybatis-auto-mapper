@@ -15,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,32 +102,33 @@ public class MapperMethodConfiguration {
     }
 
     private void initReturnType() {
-        if(mapperMethod.getReturnType().isArray()) {
+        this.returnType = mapperMethod.getReturnType();
+        if(returnType.isArray()) {
             this.returnType = returnType.getComponentType();
             return ;
         }
-        if(Map.class.isAssignableFrom(mapperMethod.getReturnType())) {
-            this.returnType = mapperMethod.getReturnType();
+        if(Map.class.isAssignableFrom(returnType)) {
+            this.returnType = this.parseMapReturnType(mapperMethod.getGenericReturnType());
             return ;
         }
-        this.returnType = mapperMethod.getReturnType();
         Type genericReturnType = mapperMethod.getGenericReturnType();
-        if(genericReturnType instanceof ParameterizedType) {
-            Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
-            if(Collection.class.isAssignableFrom(returnType)) {
-                if(actualTypeArguments[0] instanceof ParameterizedType) {
-                    Class<?> clazz = (Class<?>) ((ParameterizedType) actualTypeArguments[0]).getRawType();
-                    if(Map.class.isAssignableFrom(clazz)) {
-                        this.returnType = clazz;
-                        return ;
-                    }
-                    throw new IllegalArgumentException("build sql error: nested return type must be Map type and nested type must be one level !");
-                }
-                this.returnType = (Class<?>) actualTypeArguments[0];
-                return ;
-            }
+        if(!(genericReturnType instanceof ParameterizedType)) {
+            return ;
+        }
+        if(!Collection.class.isAssignableFrom(returnType)) {
             throw new IllegalArgumentException("build sql error: return type must be base type or Map/Collection/Pojo type !");
         }
+        Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
+        if(!(actualTypeArguments[0] instanceof ParameterizedType)) {
+            this.returnType = (Class<?>) actualTypeArguments[0];
+            return ;
+        }
+        Class<?> clazz = (Class<?>) ((ParameterizedType) actualTypeArguments[0]).getRawType();
+        if(Map.class.isAssignableFrom(clazz)) {
+            this.returnType = this.parseMapReturnType(actualTypeArguments[0]);
+            return ;
+        }
+        throw new IllegalArgumentException("build sql error: nested return type must be Map type and nested type must be one level !");
     }
 
     private void initParameterType() {
@@ -247,5 +249,11 @@ public class MapperMethodConfiguration {
                 getReturnType().equals(Void.class)            ||
                 CommonUtil.baseType(getReturnType())          ||
                 Map.class.isAssignableFrom(getReturnType());
+    }
+
+    private Class<?> parseMapReturnType(Type type) {
+        ParameterizedType mapType = (ParameterizedType) type;
+        Class<?> returnType = (Class<?>) mapType.getActualTypeArguments()[1];
+        return CommonUtil.baseType(returnType) || returnType.equals(Object.class) ? HashMap.class : returnType;
     }
 }
