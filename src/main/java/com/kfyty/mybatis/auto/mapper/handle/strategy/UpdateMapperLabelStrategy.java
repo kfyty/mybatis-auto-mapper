@@ -65,14 +65,25 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
         for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
-            builder.append("<if test=\"");
+            if(mapperMethodConfiguration.getAllowNull()) {
+                builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+                continue;
+            }
+            builder.append("<choose>");
+            builder.append("<when test=\"");
             builder.append(entity).append(".").append(entry.getKey()).append(" != null ");
             if(String.class.isAssignableFrom(entry.getValue().getType())) {
                 builder.append(" and ").append(entity).append(".").append(entry.getKey()).append(" != '' ");
             }
             builder.append("\">");
             builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
-            builder.append("</if>");
+            builder.append("</when>");
+            if(mapperMethodConfiguration.getUseDefault()) {
+                builder.append("<otherwise>");
+                builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = default, ");
+                builder.append("</otherwise>");
+            }
+            builder.append("</choose>");
         }
         return builder.toString();
     }

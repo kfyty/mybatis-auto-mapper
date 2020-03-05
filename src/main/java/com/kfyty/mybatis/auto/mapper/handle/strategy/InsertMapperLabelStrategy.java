@@ -66,12 +66,14 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
                 builder[1].append("#{").append(entity).append(".").append(field).append("}, ");
                 continue;
             }
-            builder[1].append("<if test=\"").append(entity).append(".").append(field).append(" == null\">");
-            builder[1].append("default, ");
-            builder[1].append("</if>");
-            builder[1].append("<if test=\"").append(entity).append(".").append(field).append(" != null\">");
+            builder[1].append("<choose>");
+            builder[1].append("<when test=\"").append(entity).append(".").append(field).append(" != null\">");
             builder[1].append("#{").append(entity).append(".").append(field).append("}, ");
-            builder[1].append("</if>");
+            builder[1].append("</when>");
+            builder[1].append("<otherwise>");
+            builder[1].append("default, ");
+            builder[1].append("</otherwise>");
+            builder[1].append("</choose>");
         }
         builder[1].append(mapperMethodConfiguration.getUseDefault() ? "</trim>" : "");
         return new String[] {

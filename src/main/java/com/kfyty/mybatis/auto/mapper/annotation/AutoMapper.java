@@ -52,13 +52,19 @@ public @interface AutoMapper {
     String columns() default "*";
 
     /**
-     * 插入时，遇到 null 是否转换为插入数据库默认值，仅用于方法配置
-     * @return 默认值为 true
+     * 插入/更新对象时，遇到 null 是否转换为插入数据库默认值，仅用于方法配置
+     * @return 默认值为 false
      */
-    boolean useDefault() default true;
+    boolean useDefault() default false;
 
     /**
-     * 是否继承类注解配置，仅用于方法配置
+     * 更新对象时，是否允许更新为 null 值，仅用于方法配置
+     * @return 默认值为 false
+     */
+    boolean allowNull() default false;
+
+    /**
+     * 是否继承类注解 where 配置，仅用于方法配置
      * @return 默认值为 "true
      */
     boolean extend() default true;

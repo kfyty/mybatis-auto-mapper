@@ -47,12 +47,12 @@ public class MybatisAutoMapperTest {
         return 0;
     }
 
-    @AutoMapper
+    @AutoMapper(useDefault = true)
     public int insertAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
         return 0;
     }
 
-    @AutoMapper(where = "PARENT_ID = 0", separator = "or")
+    @AutoMapper(where = "PARENT_ID = 0", separator = "or", allowNull = true)
     public int updateMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
         return 0;
     }
@@ -63,7 +63,7 @@ public class MybatisAutoMapperTest {
      * @param objs
      * @return
      */
-    @AutoMapper(primaryKey = {"id", "code"}, extend = false)
+    @AutoMapper(primaryKey = {"id", "code"}, extend = false, useDefault = true)
     public int updateAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
         return 0;
     }

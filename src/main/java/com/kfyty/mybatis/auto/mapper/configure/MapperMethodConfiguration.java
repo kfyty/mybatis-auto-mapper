@@ -62,6 +62,9 @@ public class MapperMethodConfiguration {
     private Boolean useDefault;
 
     @Getter
+    private Boolean allowNull;
+
+    @Getter
     private String table;
 
     @Getter
@@ -92,6 +95,7 @@ public class MapperMethodConfiguration {
         this.initWhere();
         this.initColumns();
         this.initUseDefault();
+        this.initAllowNull();
         this.initTable();
         this.initSelectKey();
         return this;
@@ -206,6 +210,10 @@ public class MapperMethodConfiguration {
 
     private void initUseDefault() {
         this.useDefault = methodAnnotation.useDefault();
+    }
+
+    private void initAllowNull() {
+        this.allowNull = methodAnnotation.allowNull();
     }
 
     private void initTable() {
