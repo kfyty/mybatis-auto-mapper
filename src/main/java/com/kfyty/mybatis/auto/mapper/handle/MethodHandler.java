@@ -1,6 +1,7 @@
 package com.kfyty.mybatis.auto.mapper.handle;
 
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
  * @date 2019/11/6 16:57
  * @since JDK 1.8
  */
+@Slf4j
 public class MethodHandler {
     private Method method;
     private Configuration configuration;
@@ -37,6 +39,10 @@ public class MethodHandler {
             xmlStatementBuilder.parseStatementNode();
         } catch (IncompleteElementException e) {
             configuration.addIncompleteStatement(xmlStatementBuilder);
+        }
+        if(log.isDebugEnabled()) {
+            log.debug("Auto mapper label for method:\n[{}]", method);
+            log.debug("Auto mapper label:\n[{}]", mapperHandler.getMapperXml());
         }
         return this;
     }

@@ -29,7 +29,9 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent applicationEvent) {
-        this.parseMapperInterface(applicationEvent);
+        if(applicationEvent.getApplicationContext().getParent() == null) {
+            this.parseMapperInterface(applicationEvent);
+        }
     }
 
     private void parseMapperInterface(ContextRefreshedEvent contextRefreshedEvent) {
