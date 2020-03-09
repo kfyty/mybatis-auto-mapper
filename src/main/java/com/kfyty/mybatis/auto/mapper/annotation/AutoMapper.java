@@ -65,7 +65,7 @@ public @interface AutoMapper {
 
     /**
      * 是否继承类注解 where 配置，仅用于方法配置
-     * @return 默认值为 "true
+     * @return 默认值为 true
      */
     boolean extend() default true;
 }

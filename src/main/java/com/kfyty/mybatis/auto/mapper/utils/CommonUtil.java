@@ -1,8 +1,11 @@
 package com.kfyty.mybatis.auto.mapper.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
  * @date 2019/11/6 17:40
  * @since JDK 1.8
  */
-public class CommonUtil {
+public abstract class CommonUtil {
     private static final Pattern UPPER_CASE_PATTERN = Pattern.compile("[A-Z0-9]*");
 
     public static boolean empty(String s) {
@@ -71,6 +74,10 @@ public class CommonUtil {
         return Arrays.stream(source.split(regex)).filter(e -> !empty(e)).collect(Collectors.toList());
     }
 
+    public static String convert2Hump(String s) {
+        return convert2Hump(s, false);
+    }
+
     public static String convert2Hump(String s, boolean isClass) {
         s = Optional.ofNullable(s).map(e -> e.contains("_") || UPPER_CASE_PATTERN.matcher(e).matches() ? e.toLowerCase() : e).orElseThrow(() -> new NullPointerException("column is null"));
         while(s.contains("_")) {
@@ -82,6 +89,10 @@ public class CommonUtil {
             s = s.replace("_" + ch, "" + Character.toUpperCase(ch));
         }
         return !isClass ? s : s.length() == 1 ? s.toUpperCase() : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    public static String convert2Underline(String s) {
+        return convert2Underline(s, true);
     }
 
     public static String convert2Underline(String s, boolean lower) {
@@ -101,6 +112,16 @@ public class CommonUtil {
             builder.append(c);
         }
         return lower ? builder.toString() : builder.toString().toUpperCase();
+    }
+
+    public static String fillString(String s, Object ... params) {
+        int index = -1;
+        int paramIndex = 0;
+        StringBuilder sb = new StringBuilder(s);
+        while((index = sb.indexOf("{}", index)) != -1) {
+            sb.replace(index, index + 2, Optional.ofNullable(params[paramIndex++]).map(Object::toString).orElse("null"));
+        }
+        return sb.toString();
     }
 
     public static Field getField(Class<?> clazz, String fieldName) {
@@ -148,5 +169,15 @@ public class CommonUtil {
         map.putAll(Arrays.stream(clazz.getDeclaredFields()).filter(e -> containPrivate || !Modifier.isPrivate(e.getModifiers())).collect(Collectors.toMap(Field::getName, e -> e)));
         map.putAll(getSuperFieldMap(clazz, containPrivate));
         return map;
+    }
+
+    public static void setAnnotationValue(Annotation annotation, String annotationField, Object value) throws Exception {
+        InvocationHandler invocationHandler = Proxy.getInvocationHandler(annotation);
+        Field field = invocationHandler.getClass().getDeclaredField("memberValues");
+        boolean accessible = field.isAccessible();
+        field.setAccessible(true);
+        Map memberValues = (Map) field.get(invocationHandler);
+        memberValues.put(annotationField, value);
+        field.setAccessible(accessible);
     }
 }
