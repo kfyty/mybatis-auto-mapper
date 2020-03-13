@@ -34,7 +34,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     private void operateInsert() {
         String[] insertStatement = this.buildInsertStatement(queryParameters.get(0));
-        this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.buildSelectKey(), this.table, insertStatement[0], insertStatement[1]);
+        this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.buildSelectKey(queryParameters.get(0)), this.table, insertStatement[0], insertStatement[1]);
     }
 
     private void operateInsertAll() {
@@ -42,7 +42,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
         this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.table, insertStatement[0], queryParameters.get(0), insertStatement[1]);
     }
 
-    private String buildSelectKey() {
+    private String buildSelectKey(String entity) {
         if(mapperMethodConfiguration.getSelectKey() == null) {
             return "";
         }
@@ -50,7 +50,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
         SelectKey selectKey = mapperMethodConfiguration.getSelectKey();
         String primaryKey = mapperMethodConfiguration.getPrimaryKey()[0];
         String primaryKeyType = CommonUtil.getField(mapperMethodConfiguration.getParameterType(), primaryKey).getType().getName();
-        builder.append("<selectKey keyProperty=\"").append(primaryKey).append("\" resultType=\"").append(primaryKeyType).append("\" order=\"").append(selectKey.order()).append("\">");
+        builder.append("<selectKey keyProperty=\"").append(entity).append(".").append(primaryKey).append("\" resultType=\"").append(primaryKeyType).append("\" order=\"").append(selectKey.order()).append("\">");
         builder.append(selectKey.value());
         builder.append("</selectKey>");
         return builder.toString();
