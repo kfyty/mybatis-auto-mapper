@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
 
@@ -16,7 +15,6 @@ import java.util.Properties;
  * @date 2019/11/14 19:48
  * @since JDK 1.8
  */
-@Configuration
 public class MybatisPageInterceptorConfig {
     @Autowired(required = false)
     @Qualifier("pageInterceptorProperties")
