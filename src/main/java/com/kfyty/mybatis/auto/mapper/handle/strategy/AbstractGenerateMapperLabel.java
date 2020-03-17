@@ -89,7 +89,7 @@ public abstract class AbstractGenerateMapperLabel {
             }
             SQLConditionEnum conditionEnum = SQLConditionEnum.matchSQLCondition(conditions.get(i));
             String column = Arrays.stream(conditions.get(i).split(conditionEnum.condition())).filter(e -> !e.isEmpty()).findFirst().get();
-            builder.append(CommonUtil.convert2Underline(column, true));
+            builder.append(CommonUtil.convert2Underline(column));
             this.buildBranchCondition(i, queryParameters, conditionEnum, builder);
             if(matcher.find()) {
                 if(!matcher.group().equalsIgnoreCase("OrderBy")) {
@@ -157,7 +157,7 @@ public abstract class AbstractGenerateMapperLabel {
         for (int i = 0; i < conditions.size(); i++) {
             column = column.replaceFirst(conditions.get(i), "");
             SQLConditionEnum conditionEnum = column.startsWith(SQLConditionEnum.CONDITION_OrderByAsc.condition()) ? SQLConditionEnum.CONDITION_OrderByAsc : SQLConditionEnum.CONDITION_OrderByDesc;
-            builder.append(String.format(conditionEnum.template(), CommonUtil.convert2Underline(conditions.get(i), true)));
+            builder.append(String.format(conditionEnum.template(), CommonUtil.convert2Underline(conditions.get(i))));
             if(i != conditions.size() - 1) {
                 builder.append(", ");
             }

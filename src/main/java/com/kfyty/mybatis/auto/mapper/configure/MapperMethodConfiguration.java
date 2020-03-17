@@ -227,17 +227,17 @@ public class MapperMethodConfiguration {
             return ;
         }
         if(!tableNameInvalid()) {
-            this.table = CommonUtil.convert2Underline(getReturnType().getSimpleName().replace(getSuffix(), ""), true);
+            this.table = CommonUtil.convert2Underline(getReturnType().getSimpleName().replace(getSuffix(), ""));
             return ;
         }
         if(operateEnum.equals(SQLOperateEnum.OPERATE_INSERT)          ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE)     ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_INSERT_ALL) ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE_ALL)) {
-            this.table = CommonUtil.convert2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""), true);
+            this.table = CommonUtil.convert2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""));
             return ;
         }
-        this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""), true);
+        this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
     }
 
     private void initSelectKey() {
@@ -252,11 +252,15 @@ public class MapperMethodConfiguration {
     }
 
     private boolean tableNameInvalid() {
-        return !getColumns().equals("*")                      ||
-                getReturnType().equals(void.class)            ||
-                getReturnType().equals(Void.class)            ||
-                CommonUtil.baseType(getReturnType())          ||
-                Map.class.isAssignableFrom(getReturnType());
+        return !getColumns().equals("*")                       ||
+                getReturnType().equals(void.class)             ||
+                getReturnType().equals(Void.class)             ||
+                CommonUtil.baseType(getReturnType())           ||
+                Map.class.isAssignableFrom(getReturnType())    ||
+                getReturnType().getSimpleName().endsWith("Vo") ||
+                getReturnType().getSimpleName().endsWith("VO") ||
+                getReturnType().getSimpleName().endsWith("Bo") ||
+                getReturnType().getSimpleName().endsWith("BO");
     }
 
     private Class<?> parseMapReturnType(Type type) {

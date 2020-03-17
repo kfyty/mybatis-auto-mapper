@@ -61,7 +61,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
         builder[1].append(mapperMethodConfiguration.getUseDefault() ? "<trim suffixOverrides=\", \">" : "");
         for (String field : fieldMap.keySet()) {
-            builder[0].append(CommonUtil.convert2Underline(field, true)).append(", ");
+            builder[0].append(CommonUtil.convert2Underline(field)).append(", ");
             if(!mapperMethodConfiguration.getUseDefault()) {
                 builder[1].append("#{").append(entity).append(".").append(field).append("}, ");
                 continue;

@@ -53,7 +53,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         String[] primaryKeys = mapperMethodConfiguration.getPrimaryKey();
         for (int i = 0; i < primaryKeys.length; i++) {
-            builder.append(primaryKeys[i]).append(" = #{").append(entity).append(".").append(CommonUtil.convert2Hump(primaryKeys[i], false)).append("}");
+            builder.append(primaryKeys[i]).append(" = #{").append(entity).append(".").append(CommonUtil.convert2Hump(primaryKeys[i])).append("}");
             if(i != primaryKeys.length - 1) {
                 builder.append(" and ");
             }
@@ -66,7 +66,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
         for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
             if(mapperMethodConfiguration.getAllowNull()) {
-                builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+                builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
                 continue;
             }
             builder.append("<choose>");
@@ -76,11 +76,11 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
                 builder.append(" and ").append(entity).append(".").append(entry.getKey()).append(" != '' ");
             }
             builder.append("\">");
-            builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+            builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
             builder.append("</when>");
             if(mapperMethodConfiguration.getUseDefault()) {
                 builder.append("<otherwise>");
-                builder.append(CommonUtil.convert2Underline(entry.getKey(), true)).append(" = default, ");
+                builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = default, ");
                 builder.append("</otherwise>");
             }
             builder.append("</choose>");
@@ -101,7 +101,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         List<String> conditions = CommonUtil.split(updateConditions.get(1), "And");
         int index = queryParameters.size() - conditions.size();
         for(int i = 0; i < conditions.size(); i++) {
-            builder.append(CommonUtil.convert2Underline(conditions.get(i), true)).append(" = #{").append(queryParameters.get(i + index)).append("}");
+            builder.append(CommonUtil.convert2Underline(conditions.get(i))).append(" = #{").append(queryParameters.get(i + index)).append("}");
             if(i != conditions.size() - 1) {
                 builder.append(", ");
             }
