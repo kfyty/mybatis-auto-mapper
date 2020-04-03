@@ -5,7 +5,6 @@ import com.kfyty.mybatis.auto.mapper.handle.MethodHandler;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.proxy.MybatisPageHelperProxyFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -47,7 +46,7 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
             beanFactory.removeBeanDefinition(entry.getKey());
             beanFactory.registerBeanDefinition(entry.getKey(), beanFactoryDefinitionBuilder.getBeanDefinition());
         }
-        if(configuration.getInterceptors().stream().noneMatch(e -> Interceptor.class.isAssignableFrom(e.getClass()))) {
+        if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
             configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));
         }
     }

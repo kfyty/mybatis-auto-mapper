@@ -86,6 +86,21 @@ public class MybatisAutoMapperTest {
         return null;
     }
 
+    /**
+     * 支持 find*By** 风格
+     * @param id
+     * @return
+     */
+    @AutoMapper
+    public MybatisAutoMapperTest findNameById(@Param("id") Integer id) {
+        return null;
+    }
+
+    @AutoMapper
+    public MybatisAutoMapperTest countNameAndCreateTimeById(@Param("id") Integer id) {
+        return null;
+    }
+
     @AutoMapper
     public MybatisAutoMapperTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime) {
         return null;
@@ -190,6 +205,12 @@ public class MybatisAutoMapperTest {
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findById", Integer.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
+
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findNameById", Integer.class));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
+
+        mapperMethodConfiguration.initConfiguration(this.getMethod("countNameAndCreateTimeById", Integer.class));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class));

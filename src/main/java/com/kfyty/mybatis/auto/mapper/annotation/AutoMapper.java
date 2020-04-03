@@ -52,6 +52,12 @@ public @interface AutoMapper {
     String columns() default "*";
 
     /**
+     * 符合 find*By** 风格命名时，是否从方法解析需查询的列，仅用于方法配置
+     * @return 默认值为 true
+     */
+    boolean parseColumn() default true;
+
+    /**
      * 插入/更新对象时，遇到 null 是否转换为插入数据库默认值，仅用于方法配置
      * @return 默认值为 false
      */

@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述: 映射方法配置
@@ -102,7 +104,14 @@ public class MapperMethodConfiguration {
     }
 
     public String getMatchName(SQLOperateEnum operateEnum) {
-        return this.mapperMethod.getName().replaceFirst(operateEnum.operate(), "");
+        if(operateEnum.pattern() == null) {
+            return this.mapperMethod.getName().replaceFirst(operateEnum.operate(), "");
+        }
+        Matcher matcher = operateEnum.pattern().matcher(this.mapperMethod.getName());
+        if(!matcher.find()) {
+            throw new IllegalArgumentException("Invalid SQL operate enum !");
+        }
+        return this.mapperMethod.getName().replaceFirst(matcher.group(), "");
     }
 
     private void initReturnType() {
@@ -120,7 +129,7 @@ public class MapperMethodConfiguration {
             return ;
         }
         if(!Collection.class.isAssignableFrom(returnType)) {
-            throw new IllegalArgumentException("build sql error: return type must be base type or Map/Collection/Pojo type !");
+            throw new IllegalArgumentException("Build SQL error: return type must be base type or Map/Collection/Pojo type !");
         }
         Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
         if(!(actualTypeArguments[0] instanceof ParameterizedType)) {
@@ -132,7 +141,7 @@ public class MapperMethodConfiguration {
             this.returnType = this.parseMapReturnType(actualTypeArguments[0]);
             return ;
         }
-        throw new IllegalArgumentException("build sql error: nested return type must be Map type and nested type must be one level !");
+        throw new IllegalArgumentException("Build SQL error: nested return type must be Map type and nested type must be one level !");
     }
 
     private void initParameterType() {
@@ -206,6 +215,16 @@ public class MapperMethodConfiguration {
         if(CommonUtil.empty(this.columns)) {
             this.columns = "*";
         }
+        if(operateEnum.pattern() == null || !methodAnnotation.parseColumn()) {
+            return;
+        }
+        String group = null;
+        Matcher matcher = operateEnum.pattern().matcher(this.mapperMethod.getName());
+        if(!matcher.find() || CommonUtil.empty(group = matcher.group(1))) {
+            return;
+        }
+        List<String> columns = CommonUtil.split(group, "And").stream().map(CommonUtil::convert2Underline).collect(Collectors.toList());
+        this.columns = String.join(", ", columns);
     }
 
     private void initUseDefault() {

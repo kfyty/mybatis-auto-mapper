@@ -1,5 +1,9 @@
 package com.kfyty.mybatis.auto.mapper.match;
 
+import com.kfyty.mybatis.auto.mapper.exception.SQLConditionMatchException;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,6 +15,7 @@ import java.util.Set;
  * @date 2019/11/7 10:27
  * @since JDK 1.8
  */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SQLConditionEnum {
     CONDITION_OR("Or", "", " or "),
     CONDITION_AND("And", "", " and "),
@@ -34,12 +39,6 @@ public enum SQLConditionEnum {
     private String condition;
     private String template;
     private String separate;
-
-    private SQLConditionEnum(String condition, String template, String separate) {
-        this.condition = condition;
-        this.template = template;
-        this.separate = separate;
-    }
 
     public String condition() {
         return this.condition;
@@ -74,7 +73,7 @@ public enum SQLConditionEnum {
             }
         }
         if(conditionEnums.size() > 1) {
-            throw new IllegalArgumentException("sql condition match error: more than one matched !");
+            throw new SQLConditionMatchException("SQL condition match error: more than one matched !");
         }
         return conditionEnums.isEmpty() ? CONDITION_DEFAULT : conditionEnums.iterator().next();
     }

@@ -45,12 +45,14 @@ public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     private void operateCountBy() {
-        String columns = mapperMethodConfiguration.getColumns().equals("*") ? "count(*)" : mapperMethodConfiguration.getColumns();
+        String columns = mapperMethodConfiguration.getColumns().toLowerCase();
+        columns = columns.equals("*") || !columns.contains("count") ? "count(*)" : columns;
         this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table, this.buildCondition());
     }
 
     private void operateCountAll() {
-        String columns = mapperMethodConfiguration.getColumns().equals("*") ? "count(*)" : mapperMethodConfiguration.getColumns();
+        String columns = mapperMethodConfiguration.getColumns().toLowerCase();
+        columns = columns.equals("*") || !columns.contains("count") ? "count(*)" : columns;
         this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table);
     }
 }
