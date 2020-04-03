@@ -7,7 +7,7 @@ import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.handle.MapperHandler;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -141,7 +141,7 @@ public class MybatisAutoMapperTest {
      * table: 当返回值/方法参数/Mapper接口无法解析出表名时，需以此指定
      * @return
      */
-    @AutoMapper(columns = "distinct name", table = "mybatis_jpa_support_test")
+    @AutoMapper(columns = "distinct name", table = "mybatis_auto_mapper_test")
     public List<String> findByNameNotNull() {
         return null;
     }
