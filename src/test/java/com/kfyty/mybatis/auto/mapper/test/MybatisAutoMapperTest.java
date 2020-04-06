@@ -138,6 +138,15 @@ public class MybatisAutoMapperTest {
     }
 
     /**
+     * 根据 name 排序
+     * @return
+     */
+    @AutoMapper
+    public List<String> findAllOrderByNameAsc() {
+        return null;
+    }
+
+    /**
      * table: 当返回值/方法参数/Mapper接口无法解析出表名时，需以此指定
      * @return
      */
@@ -226,6 +235,9 @@ public class MybatisAutoMapperTest {
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findAllName"));
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
+
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllOrderByNameAsc"));
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findByNameNotNull"));

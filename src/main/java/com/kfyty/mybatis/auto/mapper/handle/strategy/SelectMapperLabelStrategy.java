@@ -1,6 +1,7 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
+import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 
 /**
  * 功能描述: 生成 <select/> 标签策略
@@ -41,7 +42,10 @@ public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     private void operateSelectAll() {
-        this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), mapperMethodConfiguration.getColumns(), this.table);
+        String where = CommonUtil.empty(this.where) ? "" : " where " + this.where;
+        String sortCondition = mapperMethodConfiguration.getMatchName(operateEnum);
+        sortCondition = CommonUtil.empty(sortCondition) || !sortCondition.startsWith("OrderBy") ? "" : this.buildSortCondition(sortCondition);
+        this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), mapperMethodConfiguration.getColumns(), this.table + where + sortCondition);
     }
 
     private void operateCountBy() {
@@ -51,8 +55,9 @@ public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     private void operateCountAll() {
+        String where = CommonUtil.empty(this.where) ? "" : " where " + this.where;
         String columns = mapperMethodConfiguration.getColumns().toLowerCase();
         columns = columns.equals("*") || !columns.contains("count") ? "count(*)" : columns;
-        this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table);
+        this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table + where);
     }
 }

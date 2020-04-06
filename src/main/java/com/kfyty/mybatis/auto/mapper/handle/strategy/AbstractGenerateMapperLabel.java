@@ -7,6 +7,7 @@ import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,15 +78,16 @@ public abstract class AbstractGenerateMapperLabel {
      * @return 条件 sql
      */
     protected String buildCondition(String conditionString) {
+        Objects.requireNonNull(conditionString, "Build SQL condition error: condition is null !");
         StringBuilder builder = new StringBuilder();
         Matcher matcher = Pattern.compile("OrderBy|And|Or").matcher(conditionString);
         List<String> conditions = CommonUtil.split(conditionString, "OrderBy|And|Or");
         for (int i = 0; i < conditions.size(); i++) {
             if(conditions.get(i).contains("Asc") || conditions.get(i).contains("Desc")) {
                 if(matcher.find()) {
-                    throw new IllegalArgumentException("build sql error: order by must be last statement !");
+                    throw new IllegalArgumentException("Build SQL error: order by must be last statement !");
                 }
-                return builder.append(this.where).append(this.buildConditionOfOrderBy(conditions.get(i))).toString();
+                return builder.append(this.where).append(this.buildSortCondition(conditions.get(i))).toString();
             }
             SQLConditionEnum conditionEnum = SQLConditionEnum.matchSQLCondition(conditions.get(i));
             String column = Arrays.stream(conditions.get(i).split(conditionEnum.condition())).filter(e -> !e.isEmpty()).findFirst().get();
@@ -98,6 +100,27 @@ public abstract class AbstractGenerateMapperLabel {
             }
         }
         return builder.append(this.where).toString();
+    }
+
+    /**
+     * 生成排序条件
+     */
+    protected String buildSortCondition(String sortCondition) {
+        Objects.requireNonNull(sortCondition, "Build SQL sort error: sort condition is null !");
+        StringBuilder builder = new StringBuilder();
+        sortCondition = sortCondition.replaceFirst("OrderBy", "");
+        List<String> conditions = CommonUtil.split(sortCondition, "Asc|Desc");
+        builder.append(" order by ");
+        for (int i = 0; i < conditions.size(); i++) {
+            sortCondition = sortCondition.replaceFirst(conditions.get(i), "");
+            SQLConditionEnum conditionEnum = sortCondition.startsWith(SQLConditionEnum.CONDITION_OrderByAsc.condition()) ? SQLConditionEnum.CONDITION_OrderByAsc : SQLConditionEnum.CONDITION_OrderByDesc;
+            builder.append(String.format(conditionEnum.template(), CommonUtil.convert2Underline(conditions.get(i))));
+            if(i != conditions.size() - 1) {
+                builder.append(", ");
+            }
+            sortCondition = sortCondition.replaceFirst(conditionEnum.condition(), "");
+        }
+        return builder.toString();
     }
 
     /**
@@ -145,24 +168,5 @@ public abstract class AbstractGenerateMapperLabel {
         builder.append("#{item}");
         builder.append("</foreach>");
         return String.format(conditionEnum.template(), builder.toString());
-    }
-
-    /**
-     * 生成排序条件
-     */
-    private String buildConditionOfOrderBy(String column) {
-        StringBuilder builder = new StringBuilder();
-        List<String> conditions = CommonUtil.split(column, "Asc|Desc");
-        builder.append(" order by ");
-        for (int i = 0; i < conditions.size(); i++) {
-            column = column.replaceFirst(conditions.get(i), "");
-            SQLConditionEnum conditionEnum = column.startsWith(SQLConditionEnum.CONDITION_OrderByAsc.condition()) ? SQLConditionEnum.CONDITION_OrderByAsc : SQLConditionEnum.CONDITION_OrderByDesc;
-            builder.append(String.format(conditionEnum.template(), CommonUtil.convert2Underline(conditions.get(i))));
-            if(i != conditions.size() - 1) {
-                builder.append(", ");
-            }
-            column = column.replaceFirst(conditionEnum.condition(), "");
-        }
-        return builder.toString();
     }
 }
