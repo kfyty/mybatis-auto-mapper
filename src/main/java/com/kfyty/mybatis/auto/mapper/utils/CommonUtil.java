@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -72,6 +73,12 @@ public abstract class CommonUtil {
 
     public static List<String> split(String source, String regex) {
         return Arrays.stream(source.split(regex)).filter(e -> !empty(e)).collect(Collectors.toList());
+    }
+
+    public static String convert2BeanName(Class<?> clazz) {
+        Objects.requireNonNull(clazz);
+        String className = clazz.getSimpleName();
+        return Character.toLowerCase(className.charAt(0)) + className.substring(1);
     }
 
     public static String convert2Hump(String s) {
