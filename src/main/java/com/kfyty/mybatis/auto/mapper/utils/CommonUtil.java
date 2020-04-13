@@ -78,6 +78,9 @@ public abstract class CommonUtil {
     public static String convert2BeanName(Class<?> clazz) {
         Objects.requireNonNull(clazz);
         String className = clazz.getSimpleName();
+        if(className.length() > 1 && Character.isUpperCase(className.charAt(1))) {
+            return className;
+        }
         return Character.toLowerCase(className.charAt(0)) + className.substring(1);
     }
 
