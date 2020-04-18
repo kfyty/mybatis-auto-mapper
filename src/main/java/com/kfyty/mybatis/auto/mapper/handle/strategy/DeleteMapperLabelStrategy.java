@@ -17,6 +17,11 @@ public class DeleteMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     @Override
+    public String getMapperNodeType() {
+        return "/delete";
+    }
+
+    @Override
     public String generateMapperLabel() {
         if(operateEnum.equals(SQLOperateEnum.OPERATE_DELETE_BY)) {
             this.operateDeleteBy();

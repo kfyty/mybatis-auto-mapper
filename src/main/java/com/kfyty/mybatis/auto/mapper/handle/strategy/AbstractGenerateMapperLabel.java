@@ -39,6 +39,12 @@ public abstract class AbstractGenerateMapperLabel {
     }
 
     /**
+     * 获取 mapper 标签节点类型
+     * @return /insert /update /select /delete
+     */
+    public abstract String getMapperNodeType();
+
+    /**
      * 生成单独的 mapper 标签
      * @return 单独的 <insert/> <update/> <select/> <delete/> 标签
      */
@@ -50,7 +56,7 @@ public abstract class AbstractGenerateMapperLabel {
      */
     public String getMapperLabel() {
         if(CommonUtil.empty(this.xml)) {
-            this.generateMapperLabel();
+            this.xml = this.generateMapperLabel();
         }
         return this.xml;
     }

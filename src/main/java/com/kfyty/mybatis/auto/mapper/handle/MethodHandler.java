@@ -33,7 +33,7 @@ public class MethodHandler {
         MapperHandler mapperHandler = new MapperHandler(mapperMethodConfiguration).parse();
         MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, mapperHandler.getMapperXml());
         mapperBuilderAssistant.setCurrentNamespace(mapperMethodConfiguration.getMapperInterface().getName());
-        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperXmlLabel());
+        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperNodeType());
         XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
         try {
             xmlStatementBuilder.parseStatementNode();

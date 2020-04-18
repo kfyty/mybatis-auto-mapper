@@ -22,6 +22,11 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     @Override
+    public String getMapperNodeType() {
+        return "/insert";
+    }
+
+    @Override
     public String generateMapperLabel() {
         if(operateEnum.equals(SQLOperateEnum.OPERATE_INSERT)) {
             this.operateInsert();

@@ -17,6 +17,11 @@ public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     @Override
+    public String getMapperNodeType() {
+        return "/select";
+    }
+
+    @Override
     public String generateMapperLabel() {
         switch (operateEnum) {
             case OPERATE_PAGE_BY:

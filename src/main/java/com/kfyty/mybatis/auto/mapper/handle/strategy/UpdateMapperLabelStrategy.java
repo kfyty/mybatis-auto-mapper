@@ -22,6 +22,11 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     @Override
+    public String getMapperNodeType() {
+        return "/update";
+    }
+
+    @Override
     public String generateMapperLabel() {
         if(operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE)) {
             this.operateUpdate();
