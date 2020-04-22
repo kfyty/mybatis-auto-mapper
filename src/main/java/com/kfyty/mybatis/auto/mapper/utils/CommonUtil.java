@@ -35,11 +35,11 @@ public abstract class CommonUtil {
         return !Optional.ofNullable(arr).filter(e -> e.length != 0).isPresent();
     }
 
-    public static boolean empty(Collection c) {
+    public static boolean empty(Collection<?> c) {
         return !Optional.ofNullable(c).filter(e -> !e.isEmpty()).isPresent();
     }
 
-    public static boolean empty(Map m) {
+    public static boolean empty(Map<?, ?> m) {
         return !Optional.ofNullable(m).filter(e -> !e.isEmpty()).isPresent();
     }
 
@@ -63,10 +63,10 @@ public abstract class CommonUtil {
             return Array.getLength(obj);
         }
         if(obj instanceof Collection) {
-            return ((Collection) obj).size();
+            return ((Collection<?>) obj).size();
         }
         if(obj instanceof Map) {
-            return ((Map) obj).size();
+            return ((Map<?, ?>) obj).size();
         }
         return 1;
     }
@@ -147,7 +147,7 @@ public abstract class CommonUtil {
     }
 
     public static Field getSuperField(Class<?> clazz, String fieldName, boolean containPrivate) {
-        if(clazz.getSimpleName().equals("Object")) {
+        if(Object.class.equals(clazz)) {
             return null;
         }
         try {
@@ -171,7 +171,7 @@ public abstract class CommonUtil {
     }
 
     public static Map<String, Field> getSuperFieldMap(Class<?> clazz, boolean containPrivate) {
-        if(clazz == null || clazz.getSimpleName().equals("Object")) {
+        if(Object.class.equals(clazz)) {
             return new HashMap<>(0);
         }
         clazz = clazz.getSuperclass();
@@ -181,6 +181,7 @@ public abstract class CommonUtil {
         return map;
     }
 
+    @SuppressWarnings("all")
     public static void setAnnotationValue(Annotation annotation, String annotationField, Object value) throws Exception {
         InvocationHandler invocationHandler = Proxy.getInvocationHandler(annotation);
         Field field = invocationHandler.getClass().getDeclaredField("memberValues");

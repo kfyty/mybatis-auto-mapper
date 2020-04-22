@@ -1,6 +1,7 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
+import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
@@ -66,6 +67,9 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
         builder[1].append(mapperMethodConfiguration.getUseDefault() ? "<trim suffixOverrides=\", \">" : "");
         for (String field : fieldMap.keySet()) {
+            if(fieldMap.get(field).isAnnotationPresent(Transient.class)) {
+                continue;
+            }
             builder[0].append(CommonUtil.convert2Underline(field)).append(", ");
             if(!mapperMethodConfiguration.getUseDefault()) {
                 builder[1].append("#{").append(entity).append(".").append(field).append("}, ");

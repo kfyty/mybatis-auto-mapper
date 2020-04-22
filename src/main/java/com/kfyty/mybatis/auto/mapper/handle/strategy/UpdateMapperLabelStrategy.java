@@ -1,5 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
+import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
@@ -70,6 +71,9 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
         for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
+            if(entry.getValue().isAnnotationPresent(Transient.class)) {
+                continue;
+            }
             if(mapperMethodConfiguration.getAllowNull()) {
                 builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
                 continue;
@@ -101,7 +105,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         List<String> updateConditions = CommonUtil.split(mapperMethodConfiguration.getMatchName(operateEnum), "Set");
         if(updateConditions.size() != 2) {
-            throw new IllegalArgumentException("build sql error: cannot parse condition and set statement !");
+            throw new IllegalArgumentException("Build sql error: cannot parse condition and set statement !");
         }
         List<String> conditions = CommonUtil.split(updateConditions.get(1), "And");
         int index = queryParameters.size() - conditions.size();

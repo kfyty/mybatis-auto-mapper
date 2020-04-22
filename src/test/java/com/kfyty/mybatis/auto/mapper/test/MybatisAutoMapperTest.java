@@ -3,6 +3,7 @@ package com.kfyty.mybatis.auto.mapper.test;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.Pageable;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
+import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.handle.MapperHandler;
 import org.apache.ibatis.annotations.MapKey;
@@ -26,6 +27,9 @@ public class MybatisAutoMapperTest {
     private Integer id;
     private String name;
     private Date createTime;
+
+    @Transient
+    private Object transients;
 
     private Method getMethod(String name, Class<?> ... classes) {
         try {
