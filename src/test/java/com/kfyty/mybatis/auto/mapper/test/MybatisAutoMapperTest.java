@@ -200,60 +200,61 @@ public class MybatisAutoMapperTest {
 
     @Test
     public void test() {
+        String database = "oracle";
         MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration();
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("insertMybatisAutoMapperTest", MybatisAutoMapperTest.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertMybatisAutoMapperTest", MybatisAutoMapperTest.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("insertAllMybatisAutoMapperTest", List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("insertAllMybatisAutoMapperTest", List.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("updateMybatisAutoMapperTest", MybatisAutoMapperTest.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateMybatisAutoMapperTest", MybatisAutoMapperTest.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("updateAllMybatisAutoMapperTest", List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateAllMybatisAutoMapperTest", List.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findById", Integer.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findById", Integer.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findNameById", Integer.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findNameById", Integer.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("countNameAndCreateTimeById", Integer.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("countNameAndCreateTimeById", Integer.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllName"));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllName"), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllOrderByNameAsc"));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findAllOrderByNameAsc"), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByNameNotNull"));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByNameNotNull"), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdNotIn", List.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdNotIn", List.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("countById", Integer.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("countById", Integer.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
-        mapperMethodConfiguration.initConfiguration(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class));
+        mapperMethodConfiguration.initConfiguration(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
     }
 }

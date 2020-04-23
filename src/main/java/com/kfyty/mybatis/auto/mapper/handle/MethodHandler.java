@@ -10,6 +10,8 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * 功能描述: 方法处理器，解析单独的 Mapper 标签，并放入全局配置
@@ -20,16 +22,22 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 public class MethodHandler {
+    private String database;
     private Method method;
     private Configuration configuration;
 
     public MethodHandler(Method method, Configuration configuration) {
         this.method = method;
         this.configuration = configuration;
+        try(Connection connection = configuration.getEnvironment().getDataSource().getConnection()) {
+            this.database = connection.getMetaData().getDatabaseProductName();
+        } catch (SQLException e) {
+            log.error("Load database product type failed !", e);
+        }
     }
 
     public MethodHandler parse() {
-        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(method);
+        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(method, database);
         MapperHandler mapperHandler = new MapperHandler(mapperMethodConfiguration).parse();
         MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, mapperHandler.getMapperXml());
         mapperBuilderAssistant.setCurrentNamespace(mapperMethodConfiguration.getMapperInterface().getName());

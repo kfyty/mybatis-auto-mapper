@@ -34,6 +34,9 @@ public class MapperMethodConfiguration {
     private static final String[] DEFAULT_PRIMARY_KEY = new String[] {"id"};
 
     @Getter
+    private String database;
+
+    @Getter
     private Class<?> mapperInterface;
 
     @Getter
@@ -79,11 +82,12 @@ public class MapperMethodConfiguration {
 
     private AutoMapper methodAnnotation;
 
-    public MapperMethodConfiguration(Method mapperMethod) {
-        this.initConfiguration(mapperMethod);
+    public MapperMethodConfiguration(Method mapperMethod, String database) {
+        this.initConfiguration(mapperMethod, database);
     }
 
-    public MapperMethodConfiguration initConfiguration(Method mapperMethod) {
+    public MapperMethodConfiguration initConfiguration(Method mapperMethod, String database) {
+        this.database = database;
         this.mapperInterface = mapperMethod.getDeclaringClass();
         this.mapperMethod = mapperMethod;
         this.classAnnotation = this.mapperInterface.getAnnotation(AutoMapper.class);

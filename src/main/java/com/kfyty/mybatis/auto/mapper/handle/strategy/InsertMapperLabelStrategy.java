@@ -44,8 +44,13 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
     }
 
     private void operateInsertAll() {
-        String[] insertStatement = this.buildInsertAllStatement();
-        this.xml = String.format(this.getMapperXmlTemplate(), parameterType.getName(), this.table, insertStatement[0], queryParameters.get(0), insertStatement[1]);
+        String template = this.getMapperXmlTemplate();
+        String[] insertStatement = buildInsertAllStatement();
+        if(this.mapperMethodConfiguration.getDatabase().toLowerCase().contains("oracle")) {
+            template = this.getMapperXmlTemplate().replaceFirst("values", "").replaceFirst("separator=\", \"", "separator=\"UNION ALL\"");
+            insertStatement[1] = "select " + insertStatement[1] + " from dual";
+        }
+        this.xml = String.format(template, parameterType.getName(), this.table, insertStatement[0], queryParameters.get(0), insertStatement[1]);
     }
 
     private String buildSelectKey(String entity) {
