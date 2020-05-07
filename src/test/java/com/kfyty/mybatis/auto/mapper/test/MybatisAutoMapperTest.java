@@ -116,6 +116,11 @@ public class MybatisAutoMapperTest {
     }
 
     @AutoMapper
+    public MybatisAutoMapperTest findByIdContainsAndNameLeftLikeOrNameRightLike(@Param("id") Integer id, @Param("name") String name, @Param("name") String name2) {
+        return null;
+    }
+
+    @AutoMapper
     public MybatisAutoMapperTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end) {
         return null;
     }
@@ -231,6 +236,9 @@ public class MybatisAutoMapperTest {
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class), database);
+        System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
+
+        mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdContainsAndNameLeftLikeOrNameRightLike", Integer.class, String.class, String.class), database);
         System.out.println(new MapperHandler(mapperMethodConfiguration).parse().getMapperXml());
 
         mapperMethodConfiguration.initConfiguration(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class), database);

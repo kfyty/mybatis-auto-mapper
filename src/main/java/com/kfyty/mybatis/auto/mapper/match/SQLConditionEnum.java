@@ -29,6 +29,9 @@ public enum SQLConditionEnum {
     CONDITION_NotNull("NotNull", " is not null ", ""),
     CONDITION_IsNull("IsNull", " is null ", ""),
     CONDITION_NotLike("NotLike", " not like '${%s}' ", ""),
+    CONDITION_LeftLike("LeftLike", " like '%%${%s}' ", ""),
+    CONDITION_RightLike("RightLike", " like '${%s}%%' ", ""),
+    CONDITION_Contains("Contains", " like '%%${%s}%%' ", ""),
     CONDITION_Like("Like", " like '${%s}' ", ""),
     CONDITION_NotIn("NotIn", " not in ( %s ) ", ""),
     CONDITION_In("In", " in ( %s ) ", ""),
@@ -57,10 +60,12 @@ public enum SQLConditionEnum {
         Set<SQLConditionEnum> conditionEnums = new HashSet<>();
         for (SQLConditionEnum value : SQLConditionEnum.values()) {
             if(methodName.contains(value.condition())) {
-                if(value.equals(SQLConditionEnum.CONDITION_Like) && conditionEnums.contains(SQLConditionEnum.CONDITION_NotLike)) {
+                if(value.equals(SQLConditionEnum.CONDITION_In) && conditionEnums.contains(SQLConditionEnum.CONDITION_NotIn)) {
                     continue;
                 }
-                if(value.equals(SQLConditionEnum.CONDITION_In) && conditionEnums.contains(SQLConditionEnum.CONDITION_NotIn)) {
+                if(value.equals(SQLConditionEnum.CONDITION_Like) && (
+                        conditionEnums.contains(SQLConditionEnum.CONDITION_LeftLike) ||
+                        conditionEnums.contains(SQLConditionEnum.CONDITION_RightLike))) {
                     continue;
                 }
                 if(value.equals(SQLConditionEnum.CONDITION_EQUAL) && (
