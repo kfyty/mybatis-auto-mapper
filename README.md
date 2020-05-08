@@ -1,27 +1,59 @@
 # mybatis-auto-mapper
-mybatis 扩展包，只需引入该依赖，无需任何附加配置，即可根据接口方法名自动查询
+    一个为 mybatis 编写的非运行时扩展包，提供根据 mapper 接口方法名自动映射查询的功能！
 
-下面演示一下：
-首先建立一个普通的 springboot 项目，项目结构如下：
-![image](image/project-struct.PNG)
+## 简介
+本项目是为 mybatis 编写的一个运行在 springboot 环境下的扩展包。实现了根据 mapper 接口方法名自动映射单表的增删改查的功能。
 
-添加依赖如下，第三个就是本项目了：
-![image](image/pom.PNG)
+## 示例
 
-实体类：
-![image](image/po.PNG)
+1、在项目中添加如下依赖。
+```xml
+<dependency>
+    <groupId>com.kfyty</groupId>
+    <artifactId>mybatis-auto-mapper</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
 
-Mapper 接口：
-(注意：由于没有 Mapper.xml 文件，所以需要也只需要添加 @AutoMapper 注解)
-![image](image/mapper.PNG)
+2、在 mapper 接口方法上添加 @AutoMapper 注解。
+```java
+@AutoMapper(where = "delete = true")
+public interface EntityMapper {
+    /**
+    * 等价于：insert into entity(field1 ... fieldN) values (#{entity.field1} ... #{entity.fieldN})
+    * SelectKey 注解用于返回主键，默认提供 MySQL 自增主键实现，批量插入不支持返回主键。
+    */
+    @SelectKey
+    @AutoMapper(useDefault = true, allowNull = true)
+    int insertEntity(@Param("entity") Entity entity);
+    
+    /**
+    * 等价于：select * from entity where id = #{id} and delete = true
+    */
+    @AutoMapper
+    Entity findById(@Param("id") Integer id);
+    
+    /**
+    * 等价于：select count(*) from entity where id between #{id1} and #{id2} and delete = true
+    */
+    @AutoMapper
+    int countByIdBetween(@Param("id1") Integer id1, @Param("id2") Integer id2);
+    
+    /**
+    * 等价于：select id, name from entity where name like '${name}%' order by id asc
+    */
+    @MapKey("id")
+    @AutoMapper(extend = false)
+    Map<String, Entity> findIdAndNameByNameRightLikeOrderByIdAsc(@Param("name") String name);
+}
+```
 
-启动类：
-![image](image/boot.PNG)
-配置数据源后启动即可，测试结果请查看我的博客：
-https://blog.csdn.net/kfyty725/article/details/102979010
+3、打开 debug 信息
+在 application.yml 中添加如下配置：
+```yml
+logging:
+  level:
+    com.kfyty.mybatis.auto.mapper.handle: debug
+```
 
-结束！
-
-有兴趣的可以 clone 试试哦！
-
-PS：更多语法请参照项目中的 SQLConditionEnum.java 文件(编写方法实例请参照 MybatisAutoMapperTest.java 文件)
+更多编写实例请参考 MybatisAutoMapperTest.java 文件。
