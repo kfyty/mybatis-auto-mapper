@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,18 +41,25 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
     private void parseMapperInterface(ContextRefreshedEvent contextRefreshedEvent) {
         ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) contextRefreshedEvent.getApplicationContext();
         DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
-        Configuration configuration = applicationContext.getBean(SqlSessionFactory.class).getConfiguration();
-        Set<Class<?>> mapperInterfaces = this.getMapperInterfaces(configuration);
-        for (Class<?> mapperInterface : mapperInterfaces) {
-            Method[] methods = mapperInterface.getMethods();
-            Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> new MethodHandler(e, configuration).parse());
-            BeanDefinitionBuilder beanFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisPageHelperProxyFactoryBean.class);
-            beanFactoryDefinitionBuilder.addConstructorArgValue(applicationContext.getBean(mapperInterface));
-            beanFactory.removeBeanDefinition(CommonUtil.convert2BeanName(mapperInterface));
-            beanFactory.registerBeanDefinition(CommonUtil.convert2BeanName(mapperInterface), beanFactoryDefinitionBuilder.getBeanDefinition());
+        Map<String, SqlSessionFactory> sqlSessionFactoryMap = applicationContext.getBeansOfType(SqlSessionFactory.class);
+        if(CommonUtil.empty(sqlSessionFactoryMap)) {
+            log.info("No SqlSessionFactory instance found !");
+            return;
         }
-        if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
-            configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));
+        for (Map.Entry<String, SqlSessionFactory> entry : sqlSessionFactoryMap.entrySet()) {
+            Configuration configuration = entry.getValue().getConfiguration();
+            Set<Class<?>> mapperInterfaces = this.getMapperInterfaces(configuration);
+            for (Class<?> mapperInterface : mapperInterfaces) {
+                Method[] methods = mapperInterface.getMethods();
+                Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> new MethodHandler(e, configuration).parse());
+                BeanDefinitionBuilder beanFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisPageHelperProxyFactoryBean.class);
+                beanFactoryDefinitionBuilder.addConstructorArgValue(applicationContext.getBean(mapperInterface));
+                beanFactory.removeBeanDefinition(CommonUtil.convert2BeanName(mapperInterface));
+                beanFactory.registerBeanDefinition(CommonUtil.convert2BeanName(mapperInterface), beanFactoryDefinitionBuilder.getBeanDefinition());
+            }
+            if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
+                configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));
+            }
         }
     }
 
