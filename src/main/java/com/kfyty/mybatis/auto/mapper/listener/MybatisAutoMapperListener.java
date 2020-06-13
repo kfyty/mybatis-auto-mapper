@@ -14,12 +14,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 功能描述: Spring 监听器
@@ -48,7 +46,7 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
         }
         for (Map.Entry<String, SqlSessionFactory> entry : sqlSessionFactoryMap.entrySet()) {
             Configuration configuration = entry.getValue().getConfiguration();
-            Set<Class<?>> mapperInterfaces = this.getMapperInterfaces(configuration);
+            Collection<Class<?>> mapperInterfaces = configuration.getMapperRegistry().getMappers();
             for (Class<?> mapperInterface : mapperInterfaces) {
                 Method[] methods = mapperInterface.getMethods();
                 Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> new MethodHandler(e, configuration).parse());
@@ -60,25 +58,6 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
             if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
                 configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));
             }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Set<Class<?>> getMapperInterfaces(Configuration configuration) {
-        try {
-            Set<Class<?>> mapperInterfaces = new HashSet<>();
-            Field resources = configuration.getClass().getDeclaredField("loadedResources");
-            boolean accessible = resources.isAccessible();
-            resources.setAccessible(true);
-            Set<String> mapperInterfaceNames = (Set<String>) resources.get(configuration);
-            resources.setAccessible(accessible);
-            for (String mapperInterfaceName : mapperInterfaceNames) {
-                mapperInterfaces.add(Class.forName(mapperInterfaceName.replaceFirst("interface ", "")));
-            }
-            return mapperInterfaces;
-        } catch(NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
-            log.error("Load mapper interface error !", e);
-            throw new RuntimeException(e);
         }
     }
 }
