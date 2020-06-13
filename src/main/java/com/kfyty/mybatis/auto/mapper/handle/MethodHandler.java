@@ -2,7 +2,6 @@ package com.kfyty.mybatis.auto.mapper.handle;
 
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;
 import org.apache.ibatis.parsing.XNode;
@@ -43,11 +42,7 @@ public class MethodHandler {
         mapperBuilderAssistant.setCurrentNamespace(mapperMethodConfiguration.getMapperInterface().getName());
         XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperNodeType());
         XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
-        try {
-            xmlStatementBuilder.parseStatementNode();
-        } catch (IncompleteElementException e) {
-            configuration.addIncompleteStatement(xmlStatementBuilder);
-        }
+        xmlStatementBuilder.parseStatementNode();
         if(log.isDebugEnabled()) {
             log.debug("Auto mapper label for method:\n[{}]", method);
             log.debug("Auto mapper label:\n[{}]", mapperHandler.getMapperXml());
