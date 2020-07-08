@@ -3,12 +3,10 @@ package com.kfyty.mybatis.auto.mapper.listener;
 import com.github.pagehelper.PageInterceptor;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.handle.MethodHandler;
-import com.kfyty.mybatis.auto.mapper.proxy.MybatisPageHelperProxyFactoryBean;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -51,10 +49,6 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
             for (Class<?> mapperInterface : mapperInterfaces) {
                 Method[] methods = mapperInterface.getMethods();
                 Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> methodHandler.setHandleData(mapperInterface, e, configuration).parse());
-                BeanDefinitionBuilder beanFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisPageHelperProxyFactoryBean.class);
-                beanFactoryDefinitionBuilder.addConstructorArgValue(applicationContext.getBean(mapperInterface));
-                beanFactory.removeBeanDefinition(CommonUtil.convert2BeanName(mapperInterface));
-                beanFactory.registerBeanDefinition(CommonUtil.convert2BeanName(mapperInterface), beanFactoryDefinitionBuilder.getBeanDefinition());
             }
             if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
                 configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));

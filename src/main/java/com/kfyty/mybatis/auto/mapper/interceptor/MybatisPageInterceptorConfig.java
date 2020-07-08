@@ -23,10 +23,13 @@ public class MybatisPageInterceptorConfig {
     @Bean
     @ConditionalOnMissingBean(PageInterceptor.class)
     public PageInterceptor createPageInterceptor() {
-        PageInterceptor pageInterceptor = new PageInterceptor();
+        Properties properties = new Properties();
+        properties.setProperty("supportMethodsArguments", "true");
         if(this.properties != null) {
-            pageInterceptor.setProperties(properties);
+            properties = this.properties;
         }
+        PageInterceptor pageInterceptor = new PageInterceptor();
+        pageInterceptor.setProperties(properties);
         return pageInterceptor;
     }
 }

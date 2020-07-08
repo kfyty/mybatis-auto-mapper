@@ -1,5 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.configure;
 
+import com.kfyty.mybatis.auto.mapper.BaseMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
@@ -102,7 +103,9 @@ public class MapperMethodConfiguration {
         this.mapperInterface = mapperMethod.getDeclaringClass();
         this.childInterface = childInterface;
         this.mapperMethod = mapperMethod;
-        this.classAnnotation = this.mapperInterface.getAnnotation(AutoMapper.class);
+        this.classAnnotation = mapperInterface.equals(BaseMapper.class)
+                                    ? childInterface.getAnnotation(AutoMapper.class)
+                                    : this.mapperInterface.getAnnotation(AutoMapper.class);
         this.methodAnnotation = this.mapperMethod.getAnnotation(AutoMapper.class);
         this.operateEnum = SQLOperateEnum.matchSQLOperate(mapperMethod.getName());
         this.initReturnType();
@@ -130,7 +133,18 @@ public class MapperMethodConfiguration {
         return this.mapperMethod.getName().replaceFirst(matcher.group(), "");
     }
 
+    private Class<?> checkAndGetEntityClass() {
+        if(this.classAnnotation == null || this.classAnnotation.entity().equals(Object.class)) {
+            throw new IllegalArgumentException("Extend BaseMapper interface must declared AutoMapper annotation and entity value !");
+        }
+        return this.classAnnotation.entity();
+    }
+
     private void initReturnType() {
+        if(mapperInterface.equals(BaseMapper.class)) {
+            this.returnType = this.checkAndGetEntityClass();
+            return;
+        }
         this.returnType = mapperMethod.getReturnType();
         if(returnType.isArray()) {
             this.returnType = returnType.getComponentType();
@@ -161,6 +175,10 @@ public class MapperMethodConfiguration {
     }
 
     private void initParameterType() {
+        if(mapperInterface.equals(BaseMapper.class)) {
+            this.parameterType = this.checkAndGetEntityClass();
+            return;
+        }
         if(mapperMethod.getName().contains(SQLOperateEnum.OPERATE_INSERT_ALL.operate()) || mapperMethod.getName().contains(SQLOperateEnum.OPERATE_UPDATE_ALL.operate())) {
             this.parameterType = (Class<?>) ((ParameterizedType) mapperMethod.getGenericParameterTypes()[0]).getActualTypeArguments()[0];
             return ;

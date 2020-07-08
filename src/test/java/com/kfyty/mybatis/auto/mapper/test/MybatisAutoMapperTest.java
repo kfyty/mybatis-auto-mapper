@@ -1,7 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.test;
 
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
-import com.kfyty.mybatis.auto.mapper.annotation.Pageable;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
@@ -197,7 +196,6 @@ public class MybatisAutoMapperTest {
      * @param ids
      * @return
      */
-    @Pageable
     @AutoMapper
     public List<MybatisAutoMapperTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
         return null;
