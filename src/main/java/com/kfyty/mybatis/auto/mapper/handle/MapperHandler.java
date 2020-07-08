@@ -7,6 +7,7 @@ import com.kfyty.mybatis.auto.mapper.handle.strategy.AbstractGenerateMapperLabel
 import com.kfyty.mybatis.auto.mapper.handle.strategy.InsertMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.SelectMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
+import lombok.NoArgsConstructor;
 
 /**
  * 功能描述: Mapper 处理器，得到 Mapper 标签
@@ -15,14 +16,20 @@ import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
  * @date 2019/11/6 18:19
  * @since JDK 1.8
  */
+@NoArgsConstructor
 public class MapperHandler {
     private SQLOperateEnum operateEnum;
     private AbstractGenerateMapperLabel generateMapperLabel;
     private MapperMethodConfiguration mapperMethodConfiguration;
 
     public MapperHandler(MapperMethodConfiguration mapperMethodConfiguration) {
+        this.setMapperMethodConfiguration(mapperMethodConfiguration);
+    }
+
+    public MapperHandler setMapperMethodConfiguration(MapperMethodConfiguration mapperMethodConfiguration) {
         this.operateEnum = mapperMethodConfiguration.getOperateEnum();
         this.mapperMethodConfiguration = mapperMethodConfiguration;
+        return this;
     }
 
     public MapperHandler parse() {

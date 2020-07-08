@@ -40,6 +40,9 @@ public class MapperMethodConfiguration {
     private Class<?> mapperInterface;
 
     @Getter
+    private Class<?> childInterface;
+
+    @Getter
     private Method mapperMethod;
 
     @Getter
@@ -83,12 +86,21 @@ public class MapperMethodConfiguration {
     private AutoMapper methodAnnotation;
 
     public MapperMethodConfiguration(Method mapperMethod, String database) {
-        this.initConfiguration(mapperMethod, database);
+        this(mapperMethod.getDeclaringClass(), mapperMethod, database);
     }
 
-    public MapperMethodConfiguration initConfiguration(Method mapperMethod, String database) {
+    public MapperMethodConfiguration(Class<?> childInterface, Method mapperMethod, String database) {
+        this.parseConfiguration(childInterface, mapperMethod, database);
+    }
+
+    public MapperMethodConfiguration parseConfiguration(Method mapperMethod, String database) {
+        return this.parseConfiguration(mapperMethod.getDeclaringClass(), mapperMethod, database);
+    }
+
+    public MapperMethodConfiguration parseConfiguration(Class<?> childInterface, Method mapperMethod, String database) {
         this.database = database;
         this.mapperInterface = mapperMethod.getDeclaringClass();
+        this.childInterface = childInterface;
         this.mapperMethod = mapperMethod;
         this.classAnnotation = this.mapperInterface.getAnnotation(AutoMapper.class);
         this.methodAnnotation = this.mapperMethod.getAnnotation(AutoMapper.class);

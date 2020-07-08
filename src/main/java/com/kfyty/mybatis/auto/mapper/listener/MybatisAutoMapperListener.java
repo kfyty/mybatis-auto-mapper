@@ -44,12 +44,13 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
             log.info("No SqlSessionFactory instance found !");
             return;
         }
+        MethodHandler methodHandler = new MethodHandler();
         for (Map.Entry<String, SqlSessionFactory> entry : sqlSessionFactoryMap.entrySet()) {
             Configuration configuration = entry.getValue().getConfiguration();
             Collection<Class<?>> mapperInterfaces = configuration.getMapperRegistry().getMappers();
             for (Class<?> mapperInterface : mapperInterfaces) {
                 Method[] methods = mapperInterface.getMethods();
-                Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> new MethodHandler(e, configuration).parse());
+                Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> methodHandler.setHandleData(mapperInterface, e, configuration).parse());
                 BeanDefinitionBuilder beanFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MybatisPageHelperProxyFactoryBean.class);
                 beanFactoryDefinitionBuilder.addConstructorArgValue(applicationContext.getBean(mapperInterface));
                 beanFactory.removeBeanDefinition(CommonUtil.convert2BeanName(mapperInterface));

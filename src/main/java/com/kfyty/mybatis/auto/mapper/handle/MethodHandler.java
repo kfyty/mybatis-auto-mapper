@@ -22,10 +22,26 @@ import java.sql.SQLException;
 @Slf4j
 public class MethodHandler {
     private String database;
+    private Class<?> childInterface;
     private Method method;
     private Configuration configuration;
+    private MapperHandler mapperHandler;
+
+    public MethodHandler() {
+        this.mapperHandler = new MapperHandler();
+    }
 
     public MethodHandler(Method method, Configuration configuration) {
+        this(method.getDeclaringClass(), method, configuration);
+    }
+
+    public MethodHandler(Class<?> childInterface, Method method, Configuration configuration) {
+        this();
+        this.setHandleData(childInterface, method, configuration);
+    }
+
+    public MethodHandler setHandleData(Class<?> childInterface, Method method, Configuration configuration) {
+        this.childInterface = childInterface;
         this.method = method;
         this.configuration = configuration;
         try(Connection connection = configuration.getEnvironment().getDataSource().getConnection()) {
@@ -33,15 +49,16 @@ public class MethodHandler {
         } catch (SQLException e) {
             log.error("Load database product type failed !", e);
         }
+        return this;
     }
 
     public MethodHandler parse() {
-        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(method, database);
-        MapperHandler mapperHandler = new MapperHandler(mapperMethodConfiguration).parse();
-        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, mapperHandler.getMapperXml());
+        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(childInterface, method, database);
+        this.mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse();
+        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(this.configuration, mapperHandler.getMapperXml());
         mapperBuilderAssistant.setCurrentNamespace(mapperMethodConfiguration.getMapperInterface().getName());
         XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperNodeType());
-        XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
+        XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(this.configuration, mapperBuilderAssistant, xNode, this.configuration.getDatabaseId());
         xmlStatementBuilder.parseStatementNode();
         if(log.isDebugEnabled()) {
             log.debug("Auto mapper label for method:\n[{}]", method);
