@@ -34,5 +34,11 @@ public interface BaseMapper<PrimaryKey, T> {
     List<T> pageAll(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
     @AutoMapper
+    int deleteAll();
+
+    @AutoMapper
     T findById(@Param("id") PrimaryKey id);
+
+    @AutoMapper
+    int deleteById(@Param("id") PrimaryKey id);
 }
