@@ -295,6 +295,9 @@ public class MapperMethodConfiguration {
 
     private void initSelectKey() {
         this.selectKey = mapperInterface.getAnnotation(SelectKey.class);
+        if(mapperInterface.equals(BaseMapper.class)) {
+            this.selectKey = childInterface.getAnnotation(SelectKey.class);
+        }
         if(mapperMethod.isAnnotationPresent(SelectKey.class)) {
             this.selectKey = mapperMethod.getAnnotation(SelectKey.class);
         }
