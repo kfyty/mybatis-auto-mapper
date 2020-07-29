@@ -37,8 +37,8 @@ public interface BaseMapper<PrimaryKey, T> {
     int deleteAll();
 
     @AutoMapper
-    T findById(@Param("id") PrimaryKey id);
+    T findByPk(@Param("pk") PrimaryKey pk);
 
     @AutoMapper
-    int deleteById(@Param("id") PrimaryKey id);
+    int deleteByPk(@Param("pk") PrimaryKey pk);
 }

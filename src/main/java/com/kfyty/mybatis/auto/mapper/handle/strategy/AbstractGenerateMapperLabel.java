@@ -1,9 +1,11 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
+import com.kfyty.mybatis.auto.mapper.BaseMapper;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.regex.Pattern;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
+@Slf4j
 public abstract class AbstractGenerateMapperLabel {
     protected String xml;
     protected String table;
@@ -70,12 +73,25 @@ public abstract class AbstractGenerateMapperLabel {
         return operateEnum.template().replace("id=\"" + operateEnum.operate() + "\"", "id=\"" + statement + "\"");
     }
 
+    protected String wrapPrimaryKeyIfNecessary(String conditionString) {
+        if(conditionString == null || !conditionString.contains("Pk")) {
+            return conditionString;
+        }
+        if(!mapperMethodConfiguration.getMapperInterface().equals(BaseMapper.class)) {
+            return conditionString;
+        }
+        if(mapperMethodConfiguration.getPrimaryKey().length > 1) {
+            log.warn("Wrap primary key condition does not support composite primary keys !");
+        }
+        return conditionString.replace("Pk", mapperMethodConfiguration.getPrimaryKey()[0]);
+    }
+
     /**
      * 生成条件
      * @return 条件 sql
      */
     protected String buildCondition() {
-        return this.buildCondition(mapperMethodConfiguration.getMatchName(operateEnum));
+        return this.buildCondition(this.wrapPrimaryKeyIfNecessary(mapperMethodConfiguration.getMatchName(operateEnum)));
     }
 
     /**

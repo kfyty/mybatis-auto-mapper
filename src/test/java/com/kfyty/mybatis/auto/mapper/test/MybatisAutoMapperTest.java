@@ -1,5 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.test;
 
+import com.kfyty.mybatis.auto.mapper.BaseMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
@@ -10,6 +11,8 @@ import org.apache.ibatis.annotations.Param;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +24,6 @@ import java.util.Map;
  * @date 2019/11/13 19:02
  * @since JDK 1.8
  */
-@AutoMapper(where = "DELETE = 0")
 public class MybatisAutoMapperTest {
     private Integer id;
     private String name;
@@ -30,238 +32,165 @@ public class MybatisAutoMapperTest {
     @Transient
     private Object transients;
 
-    private Method getMethod(String name, Class<?> ... classes) {
-        try {
-            return MybatisAutoMapperTest.class.getDeclaredMethod(name, classes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
-     * 需要解析的方法需要添加 @AutoMapper 注解
-     * 需要获取主键需要添加 @SelectKey 注解，默认提供 MySQL 实现
-     * @param obj
-     * @return
+     * where: 所有的查询/更新均需要拼接的条件
+     * entity: 因为该拓展包只在应用启动时起作用，因此继承自 BaseMapper 的接口必须指定实体类型
      */
-    @SelectKey
-    @AutoMapper
-    public int insertMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
-        return 0;
-    }
+    @AutoMapper(entity = MybatisAutoMapperTest.class, where = "DELETE = 0")
+    private interface AutoMapperTest extends BaseMapper<Integer, MybatisAutoMapperTest> {
+        /**
+         * 需要解析的方法需要添加 @AutoMapper 注解
+         * 需要获取主键需要添加 @SelectKey 注解，默认提供 MySQL 自增实现
+         * @param obj obj
+         * @return effect
+         */
+        @SelectKey
+        @AutoMapper
+        int insertMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj);
 
-    @AutoMapper(useDefault = true)
-    public int insertAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
-        return 0;
-    }
+        /**
+         * useDefault: 插入数据时，遇到空值转换为插入数据库默认值
+         * @param objs objs
+         * @return effect
+         */
+        @AutoMapper(useDefault = true)
+        int insertAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs);
 
-    @AutoMapper(where = "PARENT_ID = 0", separator = "or", allowNull = true)
-    public int updateMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj) {
-        return 0;
-    }
+        /**
+         * where: 额外的更新条件
+         * separator: 拼接该 where 条件的分隔符
+         * allowNull: 允许字段更新为空值，为 false 时，只更新对象中不为空的字段
+         * @param obj obj
+         * @return effect
+         */
+        @AutoMapper(where = "PARENT_ID = 0", separator = "or", allowNull = true)
+        int updateMybatisAutoMapperTest(@Param("obj") MybatisAutoMapperTest obj);
 
-    /**
-     * primaryKey: 更新时指定主键属性，默认为 id
-     * extend: 设为 false 时，类注解 where() 失效
-     * @param objs
-     * @return
-     */
-    @AutoMapper(primaryKey = {"id", "code"}, extend = false, useDefault = true)
-    public int updateAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs) {
-        return 0;
-    }
+        /**
+         * primaryKey: 更新时主键属性，默认为 id
+         * extend: 设为 false 时，类注解 where() 失效
+         * useDefault: 对象中的值为空时，更新为数据库默认值，需数据库支持
+         * @param objs objs
+         * @return effect
+         */
+        @AutoMapper(primaryKey = {"id", "code"}, extend = false, useDefault = true)
+        int updateAllMybatisAutoMapperTest(@Param("objs") List<MybatisAutoMapperTest> objs);
 
-    /**
-     * updateBy 中必须包含 Set, 且用 And 分隔 Set 之后的字段
-     * @param code
-     * @param name
-     * @param createTime
-     * @param updateTime
-     * @return
-     */
-    @AutoMapper
-    public int updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime(@Param("code") String code, @Param("name") String name, @Param("age") Integer age, @Param("createTime") Date createTime, @Param("updateTime") Date updateTime) {
-        return 0;
-    }
+        /**
+         * 支持 updateBy*Set** 风格解析
+         * updateBy 中必须包含 Set, 且用 And 分隔 Set 之后的字段
+         * @param code code
+         * @param name name
+         * @param createTime createTime
+         * @param updateTime updateTime
+         * @return effect
+         */
+        @AutoMapper
+        int updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime(@Param("code") String code, @Param("name") String name, @Param("age") Integer age, @Param("createTime") Date createTime, @Param("updateTime") Date updateTime);
 
-    @AutoMapper
-    public MybatisAutoMapperTest findById(@Param("id") Integer id) {
-        return null;
-    }
+        /**
+         * BaseMapper 中有 findByPk 方法，自动转换为根据主键查询
+         * 当主键为 id 时，二者结果相同
+         * @param id id
+         * @return MybatisAutoMapperTest
+         */
+        @AutoMapper
+        MybatisAutoMapperTest findById(@Param("id") Integer id);
 
-    /**
-     * 支持 find*By** 风格
-     * @param id
-     * @return
-     */
-    @AutoMapper
-    public MybatisAutoMapperTest findNameById(@Param("id") Integer id) {
-        return null;
-    }
+        /**
+         * 支持 find*By** 风格
+         * @param id id
+         * @return name
+         */
+        @AutoMapper
+        List<String> findNameById(@Param("id") Integer id);
 
-    @AutoMapper
-    public MybatisAutoMapperTest countNameAndCreateTimeById(@Param("id") Integer id) {
-        return null;
-    }
+        @AutoMapper
+        MybatisAutoMapperTest countNameAndCreateTimeById(@Param("id") Integer id);
 
-    @AutoMapper
-    public MybatisAutoMapperTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime) {
-        return null;
-    }
+        @AutoMapper
+        MybatisAutoMapperTest findByIdLessThanOrCreateTimeLessEqual(@Param("id") Integer id, @Param("createTime") Date createTime);
 
-    @AutoMapper
-    public MybatisAutoMapperTest findByIdEqualAndNameNotNull(@Param("id") Integer id, @Param("name") String name) {
-        return null;
-    }
+        @AutoMapper
+        MybatisAutoMapperTest findByIdEqualAndNameNotNull(@Param("id") Integer id, @Param("name") String name);
 
-    @AutoMapper
-    public MybatisAutoMapperTest findByIdContainsAndNameLeftLikeOrNameRightLike(@Param("id") Integer id, @Param("name") String name, @Param("name") String name2) {
-        return null;
-    }
+        @AutoMapper
+        MybatisAutoMapperTest findByIdContainsAndNameLeftLikeOrNameRightLike(@Param("id") Integer id, @Param("name") String name, @Param("name") String name2);
 
-    @AutoMapper
-    public MybatisAutoMapperTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end) {
-        return null;
-    }
+        @AutoMapper
+        MybatisAutoMapperTest findByIdEqualAndNameNotNullOrCreateTimeBetween(@Param("id") Integer id, String name, @Param("start") Date start, @Param("end") Date end);
 
-    /**
-     * OrderBy 之前没有 And/Or，切必须是最后一项
-     * @param sid
-     * @param eid
-     * @param ids
-     * @return
-     */
-    @AutoMapper
-    public MybatisAutoMapperTest findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids) {
-        return null;
-    }
+        /**
+         * OrderBy 之前没有 And/Or，切必须是最后一项
+         * @param sid sid
+         * @param eid eid
+         * @param ids ids
+         * @return MybatisAutoMapperTest
+         */
+        @AutoMapper
+        MybatisAutoMapperTest findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids);
 
-    /**
-     * columns: 自定义查询列
-     * @return
-     */
-    @AutoMapper(columns = "distinct name")
-    public List<String> findAllName() {
-        return null;
-    }
+        /**
+         * columns: 自定义查询列
+         * @return names
+         */
+        @AutoMapper(columns = "distinct name")
+        List<String> findAllName();
 
-    /**
-     * 根据 name 排序
-     * @return
-     */
-    @AutoMapper
-    public List<String> findAllOrderByNameAsc() {
-        return null;
-    }
+        /**
+         * 根据 name 排序
+         * @return MybatisAutoMapperTest
+         */
+        @AutoMapper
+        List<MybatisAutoMapperTest> findAllOrderByNameAsc();
 
-    /**
-     * table: 当返回值/方法参数/Mapper接口无法解析出表名时，需以此指定
-     * @return
-     */
-    @AutoMapper(columns = "distinct name", table = "mybatis_auto_mapper_test")
-    public List<String> findByNameNotNull() {
-        return null;
-    }
+        /**
+         * table: 当返回值/方法参数/Mapper接口和数据库不一致而无法解析出表名或解析错误时，可以此指定
+         * @return names
+         */
+        @AutoMapper(columns = "distinct name", table = "mybatis_auto_mapper_test")
+        List<String> findByNameNotNull();
 
-    /**
-     * countBy 开头的方法名可获取数量，用法同 findBy/deleteBy
-     * 若需去重可使用 columns
-     * @param id
-     * @return
-     */
-    @AutoMapper
-    public int countById(@Param("id") Integer id) {
-        return 0;
-    }
+        /**
+         * countBy 开头的方法名可获取数量，用法同 findBy/deleteBy
+         * 若需去重可使用 columns
+         * @param id id
+         * @return count
+         */
+        @AutoMapper(columns = "count(distinct *)")
+        int countById(@Param("id") Integer id);
 
-    /**
-     * 返回值为 Map 时，须使用 @MapKey 注解指定 key 属性
-     * @param id
-     * @return
-     */
-    @AutoMapper
-    @MapKey("id")
-    public Map<Integer, MybatisAutoMapperTest> findByIdNotIn(@Param("ids") List<Integer> id) {
-        return null;
-    }
+        /**
+         * 返回值为 Map<PrimaryKey, Entity> 时，须使用 @MapKey 注解指定 key 属性
+         * @param id id
+         * @return map
+         */
+        @AutoMapper
+        @MapKey("id")
+        Map<Integer, MybatisAutoMapperTest> findByIdNotIn(@Param("ids") List<Integer> id);
 
-    /**
-     * 使用注解 @Pageable 且方法参数最后两参数应依次为 pageNum, pageSize 时进行分页
-     * 返回值泛型须存在
-     * 若需要返回 PageInfo 需自行转换
-     * 若不使用 @Pageable 注解，请阅读 mybatis-helper 使用文档
-     * pageBy/pageAll 仅做与 findBy/findAll 区分之用
-     * @param sid
-     * @param eid
-     * @param ids
-     * @return
-     */
-    @AutoMapper
-    public List<MybatisAutoMapperTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, int pageNum, int pageSize) {
-        return null;
+        /**
+         * 方法参数中存在 pageNum, pageSize 时进行分页
+         * 返回值泛型须存在
+         * 若需要返回 PageInfo 需自行转换
+         * pageBy/pageAll 仅做与 findBy/findAll 区分之用
+         * @param sid sid
+         * @param eid eid
+         * @param ids ids
+         * @return MybatisAutoMapperTest
+         */
+        @AutoMapper
+        List<MybatisAutoMapperTest> pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc(@Param("sid") Integer sid, @Param("eid") Integer eid, @Param("ids")List<Integer> ids, @Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
     }
 
     @Test
     public void test() {
         String database = "oracle";
         MapperHandler mapperHandler = new MapperHandler();
-        MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration();
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("insertMybatisAutoMapperTest", MybatisAutoMapperTest.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("insertAllMybatisAutoMapperTest", List.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("updateMybatisAutoMapperTest", MybatisAutoMapperTest.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("updateAllMybatisAutoMapperTest", List.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("updateByCodeAndNameSetAgeAndCreateTimeAndUpdateTime", String.class, String.class, Integer.class, Date.class, Date.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findById", Integer.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findNameById", Integer.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("countNameAndCreateTimeById", Integer.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdLessThanOrCreateTimeLessEqual", Integer.class, Date.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdEqualAndNameNotNull", Integer.class, String.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdContainsAndNameLeftLikeOrNameRightLike", Integer.class, String.class, String.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdEqualAndNameNotNullOrCreateTimeBetween", Integer.class, String.class, Date.class, Date.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findAllName"), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findAllOrderByNameAsc"), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByNameNotNull"), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("findByIdNotIn", List.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("countById", Integer.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
-
-        mapperMethodConfiguration.parseConfiguration(this.getMethod("pageByIdBetweenOrIdInOrderByNameAscCreateTimeDesc", Integer.class, Integer.class, List.class, int.class, int.class), database);
-        System.out.println(mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse().getMapperXml());
+        Arrays.stream(AutoMapperTest.class.getMethods())
+                .filter(e -> e.isAnnotationPresent(AutoMapper.class))
+                .sorted(Comparator.comparing(Method::getName))
+                .map(e -> mapperHandler.setMapperMethodConfiguration(new MapperMethodConfiguration(AutoMapperTest.class, e, database)).parse().getMapperXml())
+                .forEach(System.out::println);
     }
 }
