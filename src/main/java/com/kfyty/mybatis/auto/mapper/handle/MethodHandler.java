@@ -56,7 +56,7 @@ public class MethodHandler {
         MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(childInterface, method, database);
         this.mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse();
         MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(this.configuration, mapperHandler.getMapperXml());
-        mapperBuilderAssistant.setCurrentNamespace(mapperMethodConfiguration.getMapperInterface().getName());
+        mapperBuilderAssistant.setCurrentNamespace(this.childInterface.getName());
         XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperNodeType());
         XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(this.configuration, mapperBuilderAssistant, xNode, this.configuration.getDatabaseId());
         xmlStatementBuilder.parseStatementNode();
