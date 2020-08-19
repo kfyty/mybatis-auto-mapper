@@ -1,6 +1,11 @@
 package com.kfyty.mybatis.auto.mapper.match;
 
 import com.kfyty.mybatis.auto.mapper.exception.SQLOperateMatchException;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.AbstractGenerateMapperLabel;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.DeleteMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.InsertMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.SelectMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.ibatis.parsing.XPathParser;
@@ -19,19 +24,19 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SQLOperateEnum {
-    OPERATE_UPDATE_BY("updateBy", "", Pattern.compile("update(.*?)By")),
-    OPERATE_SELECT_BY("findBy", "", Pattern.compile("find(.*?)By")),
-    OPERATE_SELECT_ALL("findAll", "", null),
-    OPERATE_PAGE_BY("pageBy", "", Pattern.compile("page(.*?)By")),
-    OPERATE_PAGE_ALL("pageAll", "", null),
-    OPERATE_DELETE_BY("deleteBy", "", Pattern.compile("delete(.*?)By")),
-    OPERATE_DELETE_ALL("deleteAll", "", null),
-    OPERATE_COUNT_BY("countBy", "", Pattern.compile("count(.*?)By")),
-    OPERATE_COUNT_All("countAll", "", null),
-    OPERATE_INSERT_ALL("insertAll", "", null),
-    OPERATE_UPDATE_ALL("updateAll", "", null),
-    OPERATE_INSERT("insert", "", null),
-    OPERATE_UPDATE("update", "", null);
+    OPERATE_UPDATE_BY("updateBy", "", Pattern.compile("update(.*?)By"), new UpdateMapperLabelStrategy()),
+    OPERATE_SELECT_BY("findBy", "", Pattern.compile("find(.*?)By"), new SelectMapperLabelStrategy()),
+    OPERATE_SELECT_ALL("findAll", "", null, new SelectMapperLabelStrategy()),
+    OPERATE_PAGE_BY("pageBy", "", Pattern.compile("page(.*?)By"), new SelectMapperLabelStrategy()),
+    OPERATE_PAGE_ALL("pageAll", "", null, new SelectMapperLabelStrategy()),
+    OPERATE_DELETE_BY("deleteBy", "", Pattern.compile("delete(.*?)By"), new DeleteMapperLabelStrategy()),
+    OPERATE_DELETE_ALL("deleteAll", "", null, new DeleteMapperLabelStrategy()),
+    OPERATE_COUNT_BY("countBy", "", Pattern.compile("count(.*?)By"), new SelectMapperLabelStrategy()),
+    OPERATE_COUNT_All("countAll", "", null, new SelectMapperLabelStrategy()),
+    OPERATE_INSERT_ALL("insertAll", "", null, new InsertMapperLabelStrategy()),
+    OPERATE_UPDATE_ALL("updateAll", "", null, new UpdateMapperLabelStrategy()),
+    OPERATE_INSERT("insert", "", null, new InsertMapperLabelStrategy()),
+    OPERATE_UPDATE("update", "", null, new UpdateMapperLabelStrategy());
 
     static {
         XPathParser xPathParser = new XPathParser(new InputStreamReader(SQLOperateEnum.class.getResourceAsStream("/mapper-template.xml")));
@@ -41,6 +46,7 @@ public enum SQLOperateEnum {
     private String operate;
     private String template;
     private Pattern pattern;
+    private AbstractGenerateMapperLabel strategy;
 
     public String operate() {
         return this.operate;
@@ -52,6 +58,10 @@ public enum SQLOperateEnum {
 
     public Pattern pattern() {
         return this.pattern;
+    }
+
+    public AbstractGenerateMapperLabel strategy() {
+        return this.strategy;
     }
 
     public static SQLOperateEnum matchSQLOperate(String methodName) {

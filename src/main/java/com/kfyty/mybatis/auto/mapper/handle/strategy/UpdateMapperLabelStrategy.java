@@ -1,9 +1,9 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
-import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -16,11 +16,8 @@ import java.util.Map;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
+@NoArgsConstructor
 public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
-
-    public UpdateMapperLabelStrategy(MapperMethodConfiguration mapperMethodConfiguration) {
-        super(mapperMethodConfiguration);
-    }
 
     @Override
     public String getMapperNodeType() {

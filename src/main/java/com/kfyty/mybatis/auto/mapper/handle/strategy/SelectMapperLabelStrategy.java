@@ -1,7 +1,7 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import lombok.NoArgsConstructor;
 
 /**
  * 功能描述: 生成 <select/> 标签策略
@@ -10,11 +10,8 @@ import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
  * @date 2019/12/16 18:19
  * @since JDK 1.8
  */
+@NoArgsConstructor
 public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
-
-    public SelectMapperLabelStrategy(MapperMethodConfiguration mapperMethodConfiguration) {
-        super(mapperMethodConfiguration);
-    }
 
     @Override
     public String getMapperNodeType() {

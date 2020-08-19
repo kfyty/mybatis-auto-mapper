@@ -5,6 +5,7 @@ import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
  * @since JDK 1.8
  */
 @Slf4j
+@NoArgsConstructor
 public abstract class AbstractGenerateMapperLabel {
     protected String xml;
     protected String table;
@@ -32,6 +34,10 @@ public abstract class AbstractGenerateMapperLabel {
     protected MapperMethodConfiguration mapperMethodConfiguration;
 
     public AbstractGenerateMapperLabel(MapperMethodConfiguration mapperMethodConfiguration) {
+        this.initMapperMethodConfiguration(mapperMethodConfiguration);
+    }
+
+    public void initMapperMethodConfiguration(MapperMethodConfiguration mapperMethodConfiguration) {
         this.table = mapperMethodConfiguration.getTable();
         this.where = mapperMethodConfiguration.getWhere();
         this.operateEnum = mapperMethodConfiguration.getOperateEnum();

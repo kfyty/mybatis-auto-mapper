@@ -1,12 +1,8 @@
 package com.kfyty.mybatis.auto.mapper.handle;
 
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
-import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.mybatis.auto.mapper.handle.strategy.DeleteMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.AbstractGenerateMapperLabel;
-import com.kfyty.mybatis.auto.mapper.handle.strategy.InsertMapperLabelStrategy;
-import com.kfyty.mybatis.auto.mapper.handle.strategy.SelectMapperLabelStrategy;
-import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import lombok.NoArgsConstructor;
 
 /**
@@ -33,7 +29,8 @@ public class MapperHandler {
     }
 
     public MapperHandler parse() {
-        this.determineStrategy();
+        this.generateMapperLabel = this.operateEnum.strategy();
+        this.generateMapperLabel.initMapperMethodConfiguration(mapperMethodConfiguration);
         this.generateMapperLabel.generateMapperLabel();
         return this;
     }
@@ -44,25 +41,5 @@ public class MapperHandler {
 
     public String getMapperXml() {
         return this.generateMapperLabel.getMapperLabel();
-    }
-
-    private void determineStrategy() {
-        if(operateEnum.name().contains("INSERT")) {
-            this.generateMapperLabel = new InsertMapperLabelStrategy(mapperMethodConfiguration);
-            return ;
-        }
-        if(operateEnum.name().contains("UPDATE")) {
-            this.generateMapperLabel = new UpdateMapperLabelStrategy(mapperMethodConfiguration);
-            return ;
-        }
-        if(operateEnum.name().contains("DELETE")) {
-            this.generateMapperLabel = new DeleteMapperLabelStrategy(mapperMethodConfiguration);
-            return ;
-        }
-        if(operateEnum.name().contains("SELECT") || operateEnum.name().contains("PAGE") || operateEnum.name().contains("COUNT")) {
-            this.generateMapperLabel = new SelectMapperLabelStrategy(mapperMethodConfiguration);
-            return ;
-        }
-        throw new IllegalArgumentException("Build sql error: match mapper generate strategy failed !");
     }
 }
