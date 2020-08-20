@@ -48,6 +48,14 @@ public abstract class AbstractGenerateMapperLabel {
     }
 
     /**
+     * 该策略是否需要支持完整的 mapper 文件解析
+     * @return 默认 false
+     */
+    public boolean supportMapperNode() {
+        return false;
+    }
+
+    /**
      * 获取 mapper 标签节点类型
      * @return /insert /update /select /delete
      */

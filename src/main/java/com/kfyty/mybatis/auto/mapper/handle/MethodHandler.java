@@ -3,14 +3,19 @@ package com.kfyty.mybatis.auto.mapper.handle;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * 功能描述: 方法处理器，解析单独的 Mapper 标签，并放入全局配置
@@ -45,7 +50,7 @@ public class MethodHandler {
         this.method = method;
         this.configuration = configuration;
         try(Connection connection = configuration.getEnvironment().getDataSource().getConnection()) {
-            this.database = connection.getMetaData().getDatabaseProductName();
+            this.database = connection.getMetaData().getDatabaseProductName().toLowerCase();
         } catch (SQLException e) {
             log.error("Load database product type failed !", e);
         }
@@ -55,15 +60,33 @@ public class MethodHandler {
     public MethodHandler parse() {
         MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(childInterface, method, database);
         this.mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse();
-        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(this.configuration, mapperHandler.getMapperXml());
-        mapperBuilderAssistant.setCurrentNamespace(this.childInterface.getName());
-        XNode xNode = new XPathParser(mapperHandler.getMapperXml()).evalNode(mapperHandler.getMapperNodeType());
-        XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(this.configuration, mapperBuilderAssistant, xNode, this.configuration.getDatabaseId());
+        if(mapperHandler.supportMapperNode()) {
+            this.parseMapperNode(mapperHandler.getMapperXml(), this.configuration);
+            return this;
+        }
+        this.parseMapperLabel(this.childInterface, mapperHandler.getMapperXml(), mapperHandler.getMapperNodeType(), this.configuration);
+        return this;
+    }
+
+    public void parseMapperNode(String xml, Configuration configuration) {
+        InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(inputStream, configuration, xml, new HashMap<>());
+        xmlMapperBuilder.parse();
+        if(log.isDebugEnabled()) {
+            log.debug("Auto mapper label for method:\n[{}]", method);
+            log.debug("Auto mapper label:\n[{}]", xml);
+        }
+    }
+
+    public void parseMapperLabel(Class<?> namespace, String xml, String nodeType, Configuration configuration) {
+        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(configuration, xml);
+        mapperBuilderAssistant.setCurrentNamespace(namespace.getName());
+        XNode xNode = new XPathParser(xml).evalNode(nodeType);
+        XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
         xmlStatementBuilder.parseStatementNode();
         if(log.isDebugEnabled()) {
             log.debug("Auto mapper label for method:\n[{}]", method);
-            log.debug("Auto mapper label:\n[{}]", mapperHandler.getMapperXml());
+            log.debug("Auto mapper label:\n[{}]", xml);
         }
-        return this;
     }
 }

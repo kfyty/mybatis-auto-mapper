@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MapperHandler {
     private SQLOperateEnum operateEnum;
-    private AbstractGenerateMapperLabel generateMapperLabel;
+    private AbstractGenerateMapperLabel generateMapperStrategy;
     private MapperMethodConfiguration mapperMethodConfiguration;
 
     public MapperHandler(MapperMethodConfiguration mapperMethodConfiguration) {
@@ -29,17 +29,21 @@ public class MapperHandler {
     }
 
     public MapperHandler parse() {
-        this.generateMapperLabel = this.operateEnum.strategy();
-        this.generateMapperLabel.initMapperMethodConfiguration(mapperMethodConfiguration);
-        this.generateMapperLabel.generateMapperLabel();
+        this.generateMapperStrategy = this.operateEnum.strategy();
+        this.generateMapperStrategy.initMapperMethodConfiguration(mapperMethodConfiguration);
+        this.generateMapperStrategy.generateMapperLabel();
         return this;
     }
 
     public String getMapperNodeType() {
-        return this.generateMapperLabel.getMapperNodeType();
+        return this.generateMapperStrategy.getMapperNodeType();
     }
 
     public String getMapperXml() {
-        return this.generateMapperLabel.getMapperLabel();
+        return this.generateMapperStrategy.getMapperLabel();
+    }
+
+    public boolean supportMapperNode() {
+        return this.generateMapperStrategy.supportMapperNode();
     }
 }

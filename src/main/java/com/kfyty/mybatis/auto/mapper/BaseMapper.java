@@ -1,6 +1,8 @@
 package com.kfyty.mybatis.auto.mapper;
 
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.struct.TableFieldStruct;
+import com.kfyty.mybatis.auto.mapper.struct.TableStruct;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -41,4 +43,10 @@ public interface BaseMapper<PrimaryKey, T> {
 
     @AutoMapper
     int deleteByPk(@Param("pk") PrimaryKey pk);
+
+    @AutoMapper
+    TableStruct findTableStruct(@Param("database") String database);
+
+    @AutoMapper
+    List<TableFieldStruct> findTableFieldStruct(@Param("database") String database);
 }

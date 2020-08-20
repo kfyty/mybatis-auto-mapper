@@ -5,6 +5,8 @@ import com.kfyty.mybatis.auto.mapper.handle.strategy.AbstractGenerateMapperLabel
 import com.kfyty.mybatis.auto.mapper.handle.strategy.DeleteMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.InsertMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.SelectMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.TableFieldStructMapperLabelStrategy;
+import com.kfyty.mybatis.auto.mapper.handle.strategy.TableStructMapperLabelStrategy;
 import com.kfyty.mybatis.auto.mapper.handle.strategy.UpdateMapperLabelStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,7 +38,9 @@ public enum SQLOperateEnum {
     OPERATE_INSERT_ALL("insertAll", "", null, new InsertMapperLabelStrategy()),
     OPERATE_UPDATE_ALL("updateAll", "", null, new UpdateMapperLabelStrategy()),
     OPERATE_INSERT("insert", "", null, new InsertMapperLabelStrategy()),
-    OPERATE_UPDATE("update", "", null, new UpdateMapperLabelStrategy());
+    OPERATE_UPDATE("update", "", null, new UpdateMapperLabelStrategy()),
+    OPERATE_TABLE_STRUCT("findTableStruct", "", null, new TableStructMapperLabelStrategy()),
+    OPERATE_TABLE_FIELD_STRUCT("findTableFieldStruct", "", null, new TableFieldStructMapperLabelStrategy());
 
     static {
         XPathParser xPathParser = new XPathParser(new InputStreamReader(SQLOperateEnum.class.getResourceAsStream("/mapper-template.xml")));
