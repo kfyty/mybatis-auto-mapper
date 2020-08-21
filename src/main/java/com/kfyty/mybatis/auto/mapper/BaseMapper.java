@@ -6,6 +6,7 @@ import com.kfyty.mybatis.auto.mapper.struct.TableStruct;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BaseMapper<PrimaryKey, T> {
     @AutoMapper
@@ -40,6 +41,9 @@ public interface BaseMapper<PrimaryKey, T> {
 
     @AutoMapper
     T findByPk(@Param("pk") PrimaryKey pk);
+
+    @AutoMapper(parseColumn = false)
+    Map<String, Object> findMapByPk(@Param("pk") PrimaryKey pk);
 
     @AutoMapper
     int deleteByPk(@Param("pk") PrimaryKey pk);

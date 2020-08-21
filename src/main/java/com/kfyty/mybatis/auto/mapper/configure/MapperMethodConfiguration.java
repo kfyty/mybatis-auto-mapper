@@ -4,6 +4,8 @@ import com.kfyty.mybatis.auto.mapper.BaseMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
+import com.kfyty.mybatis.auto.mapper.struct.TableFieldStruct;
+import com.kfyty.mybatis.auto.mapper.struct.TableStruct;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -142,8 +144,10 @@ public class MapperMethodConfiguration {
 
     private void initReturnType() {
         if(mapperInterface.equals(BaseMapper.class)) {
-            this.returnType = this.checkAndGetEntityClass();
-            return;
+            if(List.class.isAssignableFrom(mapperMethod.getReturnType()) || Object.class.equals(mapperMethod.getReturnType())) {
+                this.returnType = this.checkAndGetEntityClass();
+                return;
+            }
         }
         this.returnType = mapperMethod.getReturnType();
         if(returnType.isArray()) {
@@ -290,7 +294,7 @@ public class MapperMethodConfiguration {
             this.table = CommonUtil.convert2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""));
             return ;
         }
-        this.table = CommonUtil.convert2Underline(mapperInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
+        this.table = CommonUtil.convert2Underline(childInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
     }
 
     private void initSelectKey() {
@@ -308,14 +312,16 @@ public class MapperMethodConfiguration {
     }
 
     private boolean tableNameInvalid() {
-        return !getColumns().equals("*")                       ||
-                getReturnType().equals(void.class)             ||
-                getReturnType().equals(Void.class)             ||
-                CommonUtil.baseType(getReturnType())           ||
-                Map.class.isAssignableFrom(getReturnType())    ||
-                getReturnType().getSimpleName().endsWith("Vo") ||
-                getReturnType().getSimpleName().endsWith("VO") ||
-                getReturnType().getSimpleName().endsWith("Bo") ||
+        return !getColumns().equals("*")                                 ||
+                getReturnType().equals(void.class)                       ||
+                getReturnType().equals(Void.class)                       ||
+                CommonUtil.baseType(getReturnType())                     ||
+                Map.class.isAssignableFrom(getReturnType())              ||
+                TableStruct.class.isAssignableFrom(getReturnType())      ||
+                TableFieldStruct.class.isAssignableFrom(getReturnType()) ||
+                getReturnType().getSimpleName().endsWith("Vo")           ||
+                getReturnType().getSimpleName().endsWith("VO")           ||
+                getReturnType().getSimpleName().endsWith("Bo")           ||
                 getReturnType().getSimpleName().endsWith("BO");
     }
 
