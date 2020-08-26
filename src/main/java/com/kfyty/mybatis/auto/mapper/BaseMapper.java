@@ -40,13 +40,13 @@ public interface BaseMapper<PrimaryKey, T> {
     int deleteAll();
 
     @AutoMapper
-    T findByPk(@Param("pk") PrimaryKey pk);
+    T findByPk(@Param("pk") PrimaryKey ... pk);
 
     @AutoMapper(parseColumn = false)
-    Map<String, Object> findMapByPk(@Param("pk") PrimaryKey pk);
+    Map<String, Object> findMapByPk(@Param("pk") PrimaryKey ... pk);
 
     @AutoMapper
-    int deleteByPk(@Param("pk") PrimaryKey pk);
+    int deleteByPk(@Param("pk") PrimaryKey ... pk);
 
     @AutoMapper
     TableStruct findTableStruct(@Param("database") String database);

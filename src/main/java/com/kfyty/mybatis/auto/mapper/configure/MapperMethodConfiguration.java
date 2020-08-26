@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 功能描述: 映射方法配置
@@ -112,8 +113,8 @@ public class MapperMethodConfiguration {
         this.operateEnum = SQLOperateEnum.matchSQLOperate(mapperMethod.getName());
         this.initReturnType();
         this.initParameterType();
-        this.initQueryParameters();
         this.initPrimaryKey();
+        this.initQueryParameters();
         this.initSuffix();
         this.initWhere();
         this.initColumns();
@@ -196,9 +197,15 @@ public class MapperMethodConfiguration {
         this.queryParameters = new ArrayList<>();
         Parameter[] parameters = mapperMethod.getParameters();
         for (int i = 0; parameters != null && i < parameters.length; i++) {
-            if(parameters[i].isAnnotationPresent(Param.class)) {
-                this.queryParameters.add(parameters[i].getAnnotation(Param.class).value());
+            if(!parameters[i].isAnnotationPresent(Param.class)) {
+                continue;
             }
+            Param param = parameters[i].getAnnotation(Param.class);
+            if(!mapperInterface.equals(BaseMapper.class) || !parameters[i].getType().isArray() || !param.value().equals("pk")) {
+                this.queryParameters.add(param.value());
+                continue;
+            }
+            IntStream.range(0, primaryKey.length).forEach(e -> this.queryParameters.add(param.value() + "[" + e + "]"));
         }
     }
 

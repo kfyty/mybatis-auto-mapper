@@ -94,10 +94,8 @@ public abstract class AbstractGenerateMapperLabel {
         if(!mapperMethodConfiguration.getMapperInterface().equals(BaseMapper.class)) {
             return conditionString;
         }
-        if(mapperMethodConfiguration.getPrimaryKey().length > 1) {
-            log.warn("Wrap primary key condition does not support composite primary keys !");
-        }
-        return conditionString.replace("Pk", mapperMethodConfiguration.getPrimaryKey()[0]);
+        String pkCondition = String.join("And", mapperMethodConfiguration.getPrimaryKey());
+        return conditionString.replace("Pk", pkCondition);
     }
 
     /**
