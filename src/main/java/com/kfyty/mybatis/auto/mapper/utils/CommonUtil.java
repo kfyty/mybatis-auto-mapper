@@ -89,7 +89,10 @@ public abstract class CommonUtil {
     }
 
     public static String convert2Hump(String s, boolean isClass) {
-        s = Optional.ofNullable(s).map(e -> e.contains("_") || UPPER_CASE_PATTERN.matcher(e).matches() ? e.toLowerCase() : e).orElseThrow(() -> new NullPointerException("column is null"));
+        if(empty(s)) {
+            throw new NullPointerException("column is null");
+        }
+        s = s.contains("_") || UPPER_CASE_PATTERN.matcher(s).matches() ? s.toLowerCase() : s;
         while(s.contains("_")) {
             int index = s.indexOf('_');
             if(index == s.length() - 1) {
@@ -106,7 +109,9 @@ public abstract class CommonUtil {
     }
 
     public static String convert2Underline(String s, boolean lower) {
-        Optional.ofNullable(s).filter(e -> !e.isEmpty()).orElseThrow(() -> new NullPointerException("field is null"));
+        if(empty(s)) {
+            throw new NullPointerException("field is null");
+        }
         if(UPPER_CASE_PATTERN.matcher(s).matches()) {
             return lower ? s.toLowerCase() : s.toUpperCase();
         }
@@ -139,24 +144,11 @@ public abstract class CommonUtil {
     }
 
     public static Field getField(Class<?> clazz, String fieldName, boolean containPrivate) {
-        try {
-            return clazz.getDeclaredField(fieldName);
-        } catch(NoSuchFieldException e) {
-            return getSuperField(clazz, fieldName, containPrivate);
-        }
+        return getFieldMap(clazz, containPrivate).get(fieldName);
     }
 
     public static Field getSuperField(Class<?> clazz, String fieldName, boolean containPrivate) {
-        if(Object.class.equals(clazz)) {
-            return null;
-        }
-        try {
-            clazz = clazz.getSuperclass();
-            Field field = clazz.getDeclaredField(fieldName);
-            return !containPrivate && Modifier.isPrivate(field.getModifiers()) ? null : field;
-        } catch(NoSuchFieldException e) {
-            return getSuperField(clazz, fieldName, containPrivate);
-        }
+        return getSuperFieldMap(clazz, containPrivate).get(fieldName);
     }
 
     public static Map<String, Field> getFieldMap(Class<?> clazz) {
