@@ -8,6 +8,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 预设接口，提供基础功能
+ * 继承此接口的 mapper，需添加 @AutoMapper(entity = Entity.class)
+ * @param <PrimaryKey> 实体主键类型
+ * @param <T> 实体泛型
+ */
 public interface BaseMapper<PrimaryKey, T> {
     /**
      * 插入单条数据
