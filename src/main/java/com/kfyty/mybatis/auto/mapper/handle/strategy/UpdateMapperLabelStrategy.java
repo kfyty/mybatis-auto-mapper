@@ -1,5 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
+import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
@@ -71,8 +72,10 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
             if(entry.getValue().isAnnotationPresent(Transient.class)) {
                 continue;
             }
+            Column wrapColumn = wrapColumnIfNecessary(entry.getKey(), entry.getValue());
+            String wrapField = wrapFieldNameIfNecessary(entry.getKey(), wrapColumn);
             if(mapperMethodConfiguration.getAllowNull()) {
-                builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+                builder.append(wrapColumn.value()).append(" = ").append("#{").append(entity).append(".").append(wrapField).append("}, ");
                 continue;
             }
             builder.append("<choose>");
@@ -82,11 +85,11 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
                 builder.append(" and ").append(entity).append(".").append(entry.getKey()).append(" != '' ");
             }
             builder.append("\">");
-            builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = ").append("#{").append(entity).append(".").append(entry.getKey()).append("}, ");
+            builder.append(wrapColumn.value()).append(" = ").append("#{").append(entity).append(".").append(wrapField).append("}, ");
             builder.append("</when>");
             if(mapperMethodConfiguration.getUseDefault()) {
                 builder.append("<otherwise>");
-                builder.append(CommonUtil.convert2Underline(entry.getKey())).append(" = default, ");
+                builder.append(wrapColumn.value()).append(" = default, ");
                 builder.append("</otherwise>");
             }
             builder.append("</choose>");

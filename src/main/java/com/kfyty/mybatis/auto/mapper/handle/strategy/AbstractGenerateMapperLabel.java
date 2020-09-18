@@ -1,13 +1,17 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
 import com.kfyty.mybatis.auto.mapper.BaseMapper;
+import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.type.JdbcType;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -87,6 +91,10 @@ public abstract class AbstractGenerateMapperLabel {
         return operateEnum.template().replace("id=\"" + operateEnum.operate() + "\"", "id=\"" + statement + "\"");
     }
 
+    /**
+     * 包装主键
+     * @return 包装后的方法名称
+     */
     protected String wrapPrimaryKeyIfNecessary(String conditionString) {
         if(conditionString == null || !conditionString.contains("Pk")) {
             return conditionString;
@@ -96,6 +104,43 @@ public abstract class AbstractGenerateMapperLabel {
         }
         String pkCondition = String.join("And", mapperMethodConfiguration.getPrimaryKey());
         return conditionString.replace("Pk", pkCondition);
+    }
+
+    /**
+     * 包装列
+     * @return 包装后的列
+     */
+    protected Column wrapColumnIfNecessary(final String fieldName, final Field field) {
+        if(field.isAnnotationPresent(Column.class)) {
+            return field.getAnnotation(Column.class);
+        }
+        return new Column() {
+            @Override
+            public String value() {
+                return CommonUtil.convert2Underline(fieldName);
+            }
+
+            @Override
+            public JdbcType jdbcType() {
+                return JdbcType.OTHER;
+            }
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Column.class;
+            }
+        };
+    }
+
+    /**
+     * 包装属性名称
+     * @return 包装后的属性名称
+     */
+    protected String wrapFieldNameIfNecessary(String fieldName, Column annotation) {
+        if(annotation != null && annotation.jdbcType() != JdbcType.OTHER) {
+            fieldName += ", jdbcType=" + annotation.jdbcType().name();
+        }
+        return fieldName;
     }
 
     /**

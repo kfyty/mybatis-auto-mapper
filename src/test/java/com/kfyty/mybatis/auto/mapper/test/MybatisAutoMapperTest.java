@@ -2,12 +2,14 @@ package com.kfyty.mybatis.auto.mapper.test;
 
 import com.kfyty.mybatis.auto.mapper.BaseMapper;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
+import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.handle.MapperHandler;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.type.JdbcType;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class MybatisAutoMapperTest {
     private Integer id;
     private String name;
+
+    @Column(value = "CREATE_TIME", jdbcType = JdbcType.DATE)
     private Date createTime;
 
     @Transient
