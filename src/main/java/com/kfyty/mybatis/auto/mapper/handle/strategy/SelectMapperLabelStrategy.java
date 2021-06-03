@@ -1,6 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.CommonUtil;
 import lombok.NoArgsConstructor;
 
 /**
@@ -52,14 +52,14 @@ public class SelectMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     private void operateCountBy() {
         String columns = mapperMethodConfiguration.getColumns().toLowerCase();
-        columns = columns.equals("*") || !columns.contains("count") ? "count(*)" : columns;
+        columns = "*".equals(columns) || !columns.contains("count") ? "count(*)" : columns;
         this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table, this.buildCondition());
     }
 
     private void operateCountAll() {
         String where = CommonUtil.empty(this.where) ? "" : " where " + this.where;
         String columns = mapperMethodConfiguration.getColumns().toLowerCase();
-        columns = columns.equals("*") || !columns.contains("count") ? "count(*)" : columns;
+        columns = "*".equals(columns) || !columns.contains("count") ? "count(*)" : columns;
         this.xml = String.format(this.getMapperXmlTemplate(), returnType.getName(), columns, this.table + where);
     }
 }

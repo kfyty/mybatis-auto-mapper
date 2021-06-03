@@ -3,11 +3,10 @@ package com.kfyty.mybatis.auto.mapper.listener;
 import com.github.pagehelper.PageInterceptor;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.handle.MethodHandler;
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -36,7 +35,6 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
 
     private void parseMapperInterface(ContextRefreshedEvent contextRefreshedEvent) {
         ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) contextRefreshedEvent.getApplicationContext();
-        DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
         Map<String, SqlSessionFactory> sqlSessionFactoryMap = applicationContext.getBeansOfType(SqlSessionFactory.class);
         if(CommonUtil.empty(sqlSessionFactoryMap)) {
             log.info("No SqlSessionFactory instance found !");

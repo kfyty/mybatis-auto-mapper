@@ -3,7 +3,8 @@ package com.kfyty.mybatis.auto.mapper.handle.strategy;
 import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.CommonUtil;
+import com.kfyty.support.utils.ReflectUtil;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
@@ -57,7 +58,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         String[] primaryKeys = mapperMethodConfiguration.getPrimaryKey();
         for (int i = 0; i < primaryKeys.length; i++) {
-            builder.append(primaryKeys[i]).append(" = #{").append(entity).append(".").append(CommonUtil.convert2Hump(primaryKeys[i])).append("}");
+            builder.append(primaryKeys[i]).append(" = #{").append(entity).append(".").append(CommonUtil.underline2CamelCase(primaryKeys[i])).append("}");
             if(i != primaryKeys.length - 1) {
                 builder.append(" and ");
             }
@@ -67,7 +68,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     private String buildUpdateStatement(String entity) {
         StringBuilder builder = new StringBuilder();
-        Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
+        Map<String, Field> fieldMap = ReflectUtil.getFieldMap(parameterType);
         for (Map.Entry<String, Field> entry : fieldMap.entrySet()) {
             if(entry.getValue().isAnnotationPresent(Transient.class)) {
                 continue;
@@ -110,7 +111,7 @@ public class UpdateMapperLabelStrategy extends AbstractGenerateMapperLabel {
         List<String> conditions = CommonUtil.split(updateConditions.get(1), "And");
         int index = queryParameters.size() - conditions.size();
         for(int i = 0; i < conditions.size(); i++) {
-            builder.append(CommonUtil.convert2Underline(conditions.get(i))).append(" = #{").append(queryParameters.get(i + index)).append("}");
+            builder.append(CommonUtil.camelCase2Underline(conditions.get(i))).append(" = #{").append(queryParameters.get(i + index)).append("}");
             if(i != conditions.size() - 1) {
                 builder.append(", ");
             }

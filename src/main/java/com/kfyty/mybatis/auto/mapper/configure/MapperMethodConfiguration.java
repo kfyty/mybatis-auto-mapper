@@ -6,7 +6,8 @@ import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.struct.TableFieldStruct;
 import com.kfyty.mybatis.auto.mapper.struct.TableStruct;
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.CommonUtil;
+import com.kfyty.support.utils.ReflectUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -201,7 +202,7 @@ public class MapperMethodConfiguration {
                 continue;
             }
             Param param = parameters[i].getAnnotation(Param.class);
-            if(!mapperInterface.equals(BaseMapper.class) || !parameters[i].getType().isArray() || !param.value().equals("pk")) {
+            if(!mapperInterface.equals(BaseMapper.class) || !parameters[i].getType().isArray() || !"pk".equals(param.value())) {
                 this.queryParameters.add(param.value());
                 continue;
             }
@@ -268,7 +269,7 @@ public class MapperMethodConfiguration {
         if(!matcher.find() || CommonUtil.empty(group = matcher.group(1))) {
             return;
         }
-        List<String> columns = CommonUtil.split(group, "And").stream().map(CommonUtil::convert2Underline).collect(Collectors.toList());
+        List<String> columns = CommonUtil.split(group, "And").stream().map(CommonUtil::camelCase2Underline).collect(Collectors.toList());
         this.columns = String.join(", ", columns);
     }
 
@@ -291,17 +292,17 @@ public class MapperMethodConfiguration {
             return ;
         }
         if(!tableNameInvalid()) {
-            this.table = CommonUtil.convert2Underline(getReturnType().getSimpleName().replace(getSuffix(), ""));
+            this.table = CommonUtil.camelCase2Underline(getReturnType().getSimpleName().replace(getSuffix(), ""));
             return ;
         }
         if(operateEnum.equals(SQLOperateEnum.OPERATE_INSERT)          ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE)     ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_INSERT_ALL) ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE_ALL)) {
-            this.table = CommonUtil.convert2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""));
+            this.table = CommonUtil.camelCase2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""));
             return ;
         }
-        this.table = CommonUtil.convert2Underline(childInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
+        this.table = CommonUtil.camelCase2Underline(childInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
     }
 
     private void initSelectKey() {
@@ -319,10 +320,10 @@ public class MapperMethodConfiguration {
     }
 
     private boolean tableNameInvalid() {
-        return !getColumns().equals("*")                                 ||
+        return !"*".equals(getColumns())                                 ||
                 getReturnType().equals(void.class)                       ||
                 getReturnType().equals(Void.class)                       ||
-                CommonUtil.baseType(getReturnType())                     ||
+                ReflectUtil.isBaseDataType(getReturnType())              ||
                 Map.class.isAssignableFrom(getReturnType())              ||
                 TableStruct.class.isAssignableFrom(getReturnType())      ||
                 TableFieldStruct.class.isAssignableFrom(getReturnType()) ||
@@ -335,6 +336,6 @@ public class MapperMethodConfiguration {
     private Class<?> parseMapReturnType(Type type) {
         ParameterizedType mapType = (ParameterizedType) type;
         Class<?> returnType = (Class<?>) mapType.getActualTypeArguments()[1];
-        return CommonUtil.baseType(returnType) || returnType.equals(Object.class) ? HashMap.class : returnType;
+        return ReflectUtil.isBaseDataType(returnType) || returnType.equals(Object.class) ? HashMap.class : returnType;
     }
 }

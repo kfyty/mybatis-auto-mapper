@@ -25,6 +25,8 @@
         <maven.compiler.version>3.8.0</maven.compiler.version>
         <maven.source.version>3.1.0</maven.source.version>
 
+        <kfyty.utils.version>1.0-SNAPSHOT</kfyty.utils.version>
+
         <spring.version>5.2.0.RELEASE</spring.version>
         <springboot.version>2.1.7.RELEASE</springboot.version>
 
@@ -71,6 +73,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.kfyty</groupId>
+            <artifactId>kfyty-support</artifactId>
+            <version>${kfyty.utils.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>${springboot.version}</version>
@@ -107,15 +115,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${sl4j.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

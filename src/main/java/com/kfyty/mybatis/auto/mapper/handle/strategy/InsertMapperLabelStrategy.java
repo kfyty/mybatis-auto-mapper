@@ -4,7 +4,7 @@ import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.ReflectUtil;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
@@ -58,7 +58,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
         StringBuilder builder = new StringBuilder();
         SelectKey selectKey = mapperMethodConfiguration.getSelectKey();
         String primaryKey = mapperMethodConfiguration.getPrimaryKey()[0];
-        String primaryKeyType = CommonUtil.getField(mapperMethodConfiguration.getParameterType(), primaryKey).getType().getName();
+        String primaryKeyType = ReflectUtil.getField(mapperMethodConfiguration.getParameterType(), primaryKey).getType().getName();
         builder.append("<selectKey keyProperty=\"").append(entity).append(".").append(primaryKey).append("\" resultType=\"").append(primaryKeyType).append("\" order=\"").append(selectKey.order()).append("\">");
         builder.append(selectKey.value());
         builder.append("</selectKey>");
@@ -67,7 +67,7 @@ public class InsertMapperLabelStrategy extends AbstractGenerateMapperLabel {
 
     private String[] buildInsertStatement(String entity) {
         StringBuilder[] builder = new StringBuilder[] {new StringBuilder(), new StringBuilder()};
-        Map<String, Field> fieldMap = CommonUtil.getFieldMap(parameterType);
+        Map<String, Field> fieldMap = ReflectUtil.getFieldMap(parameterType);
         builder[1].append(mapperMethodConfiguration.getUseDefault() ? "<trim suffixOverrides=\", \">" : "");
         for (String field : fieldMap.keySet()) {
             if(fieldMap.get(field).isAnnotationPresent(Transient.class)) {

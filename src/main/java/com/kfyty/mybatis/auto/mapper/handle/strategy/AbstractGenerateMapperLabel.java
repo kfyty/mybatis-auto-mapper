@@ -5,7 +5,7 @@ import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.mybatis.auto.mapper.utils.CommonUtil;
+import com.kfyty.support.utils.CommonUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
@@ -117,7 +117,7 @@ public abstract class AbstractGenerateMapperLabel {
         return new Column() {
             @Override
             public String value() {
-                return CommonUtil.convert2Underline(fieldName);
+                return CommonUtil.camelCase2Underline(fieldName);
             }
 
             @Override
@@ -170,10 +170,10 @@ public abstract class AbstractGenerateMapperLabel {
             }
             SQLConditionEnum conditionEnum = SQLConditionEnum.matchSQLCondition(conditions.get(i));
             String column = Arrays.stream(conditions.get(i).split(conditionEnum.condition())).filter(e -> !e.isEmpty()).findFirst().get();
-            builder.append(CommonUtil.convert2Underline(column));
+            builder.append(CommonUtil.camelCase2Underline(column));
             this.buildBranchCondition(i, queryParameters, conditionEnum, builder);
             if(matcher.find()) {
-                if(!matcher.group().equalsIgnoreCase("OrderBy")) {
+                if(!"OrderBy".equalsIgnoreCase(matcher.group())) {
                     builder.append(SQLConditionEnum.matchSQLCondition(matcher.group()).separate());
                 }
             }
@@ -193,7 +193,7 @@ public abstract class AbstractGenerateMapperLabel {
         for (int i = 0; i < conditions.size(); i++) {
             sortCondition = sortCondition.replaceFirst(conditions.get(i), "");
             SQLConditionEnum conditionEnum = sortCondition.startsWith(SQLConditionEnum.CONDITION_OrderByAsc.condition()) ? SQLConditionEnum.CONDITION_OrderByAsc : SQLConditionEnum.CONDITION_OrderByDesc;
-            builder.append(String.format(conditionEnum.template(), CommonUtil.convert2Underline(conditions.get(i))));
+            builder.append(String.format(conditionEnum.template(), CommonUtil.camelCase2Underline(conditions.get(i))));
             if(i != conditions.size() - 1) {
                 builder.append(", ");
             }
@@ -246,6 +246,6 @@ public abstract class AbstractGenerateMapperLabel {
         builder.append("<foreach collection=\"").append(queryParameters.get(index)).append("\" item=\"item\" separator=\", \">");
         builder.append("#{item}");
         builder.append("</foreach>");
-        return String.format(conditionEnum.template(), builder.toString());
+        return String.format(conditionEnum.template(), builder);
     }
 }
