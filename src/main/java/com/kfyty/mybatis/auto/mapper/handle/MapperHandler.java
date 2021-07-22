@@ -24,12 +24,12 @@ public class MapperHandler {
 
     public MapperHandler setMapperMethodConfiguration(MapperMethodConfiguration mapperMethodConfiguration) {
         this.operateEnum = mapperMethodConfiguration.getOperateEnum();
+        this.generateMapperStrategy = this.operateEnum.strategy();
         this.mapperMethodConfiguration = mapperMethodConfiguration;
         return this;
     }
 
-    public MapperHandler parse() {
-        this.generateMapperStrategy = this.operateEnum.strategy();
+    public MapperHandler doResolve() {
         this.generateMapperStrategy.initMapperMethodConfiguration(mapperMethodConfiguration);
         this.generateMapperStrategy.generateMapperLabel();
         return this;
@@ -41,6 +41,10 @@ public class MapperHandler {
 
     public String getMapperXml() {
         return this.generateMapperStrategy.getMapperLabel();
+    }
+
+    public void resetMapperXml() {
+        this.generateMapperStrategy.resetMapperXml();
     }
 
     public boolean supportMapperNode() {

@@ -34,12 +34,6 @@ public @interface AutoMapper {
     String table() default "";
 
     /**
-     * 继承自 BaseMapper 的方法需在子接口上声明实体类型
-     * @return 默认值为 Object.class
-     */
-    Class<?> entity() default Object.class;
-
-    /**
      * 查询时添加额外的条件，可用于接口配置
      * @return 默认值为 ""
      */

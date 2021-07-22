@@ -6,6 +6,7 @@ import com.kfyty.mybatis.auto.mapper.annotation.SelectKey;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
 import com.kfyty.mybatis.auto.mapper.struct.TableFieldStruct;
 import com.kfyty.mybatis.auto.mapper.struct.TableStruct;
+import com.kfyty.support.generic.SimpleGeneric;
 import com.kfyty.support.utils.CommonUtil;
 import com.kfyty.support.utils.ReflectUtil;
 import lombok.Getter;
@@ -15,7 +16,6 @@ import org.apache.ibatis.annotations.Param;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -127,69 +127,45 @@ public class MapperMethodConfiguration {
     }
 
     public String getMatchName(SQLOperateEnum operateEnum) {
-        if(operateEnum.pattern() == null) {
+        if (operateEnum.pattern() == null) {
             return this.mapperMethod.getName().replaceFirst(operateEnum.operate(), "");
         }
         Matcher matcher = operateEnum.pattern().matcher(this.mapperMethod.getName());
-        if(!matcher.find()) {
+        if (!matcher.find()) {
             throw new IllegalArgumentException("Invalid SQL operate enum !");
         }
         return this.mapperMethod.getName().replaceFirst(matcher.group(), "");
     }
 
-    private Class<?> checkAndGetEntityClass() {
-        if(this.classAnnotation == null || this.classAnnotation.entity().equals(Object.class)) {
-            throw new IllegalArgumentException("Extend BaseMapper interface must declared AutoMapper annotation and entity value !");
-        }
-        return this.classAnnotation.entity();
+    private Class<?> deduceEntityClass() {
+        return ReflectUtil.getSuperGeneric(this.childInterface, 1, e -> e instanceof ParameterizedType && ((ParameterizedType) e).getRawType().equals(BaseMapper.class));
     }
 
     private void initReturnType() {
-        if(mapperInterface.equals(BaseMapper.class)) {
-            if(List.class.isAssignableFrom(mapperMethod.getReturnType()) || Object.class.equals(mapperMethod.getReturnType())) {
-                this.returnType = this.checkAndGetEntityClass();
+        if (mapperInterface.equals(BaseMapper.class)) {
+            if (Collection.class.isAssignableFrom(mapperMethod.getReturnType()) || Object.class.equals(mapperMethod.getReturnType())) {
+                this.returnType = this.deduceEntityClass();
                 return;
             }
         }
-        this.returnType = mapperMethod.getReturnType();
-        if(returnType.isArray()) {
-            this.returnType = returnType.getComponentType();
-            return ;
+        SimpleGeneric generic = SimpleGeneric.from(this.mapperMethod);
+        if (Map.class.isAssignableFrom(generic.getSimpleActualType()) || generic.isMapGeneric() && generic.getMapValueType().get().equals(Object.class)) {
+            this.returnType = HashMap.class;
+            return;
         }
-        if(Map.class.isAssignableFrom(returnType)) {
-            this.returnType = this.parseMapReturnType(mapperMethod.getGenericReturnType());
-            return ;
-        }
-        Type genericReturnType = mapperMethod.getGenericReturnType();
-        if(!(genericReturnType instanceof ParameterizedType)) {
-            return ;
-        }
-        if(!Collection.class.isAssignableFrom(returnType)) {
-            throw new IllegalArgumentException("Build SQL error: return type must be base type or Map/Collection/Pojo type !");
-        }
-        Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
-        if(!(actualTypeArguments[0] instanceof ParameterizedType)) {
-            this.returnType = (Class<?>) actualTypeArguments[0];
-            return ;
-        }
-        Class<?> clazz = (Class<?>) ((ParameterizedType) actualTypeArguments[0]).getRawType();
-        if(Map.class.isAssignableFrom(clazz)) {
-            this.returnType = this.parseMapReturnType(actualTypeArguments[0]);
-            return ;
-        }
-        throw new IllegalArgumentException("Build SQL error: nested return type must be Map type and nested type must be one level !");
+        this.returnType = generic.getSimpleActualType();
     }
 
     private void initParameterType() {
-        if(mapperInterface.equals(BaseMapper.class)) {
-            this.parameterType = this.checkAndGetEntityClass();
+        if (mapperInterface.equals(BaseMapper.class)) {
+            this.parameterType = this.deduceEntityClass();
             return;
         }
-        if(mapperMethod.getName().contains(SQLOperateEnum.OPERATE_INSERT_ALL.operate()) || mapperMethod.getName().contains(SQLOperateEnum.OPERATE_UPDATE_ALL.operate())) {
+        if (mapperMethod.getName().contains(SQLOperateEnum.OPERATE_INSERT_ALL.operate()) || mapperMethod.getName().contains(SQLOperateEnum.OPERATE_UPDATE_ALL.operate())) {
             this.parameterType = (Class<?>) ((ParameterizedType) mapperMethod.getGenericParameterTypes()[0]).getActualTypeArguments()[0];
-            return ;
+            return;
         }
-        if(mapperMethod.getName().contains(SQLOperateEnum.OPERATE_INSERT.operate()) || mapperMethod.getName().contains(SQLOperateEnum.OPERATE_UPDATE.operate())) {
+        if (mapperMethod.getName().contains(SQLOperateEnum.OPERATE_INSERT.operate()) || mapperMethod.getName().contains(SQLOperateEnum.OPERATE_UPDATE.operate())) {
             this.parameterType = mapperMethod.getParameterTypes()[0];
         }
     }
@@ -198,11 +174,11 @@ public class MapperMethodConfiguration {
         this.queryParameters = new ArrayList<>();
         Parameter[] parameters = mapperMethod.getParameters();
         for (int i = 0; parameters != null && i < parameters.length; i++) {
-            if(!parameters[i].isAnnotationPresent(Param.class)) {
+            if (!parameters[i].isAnnotationPresent(Param.class)) {
                 continue;
             }
             Param param = parameters[i].getAnnotation(Param.class);
-            if(!mapperInterface.equals(BaseMapper.class) || !parameters[i].getType().isArray() || !"pk".equals(param.value())) {
+            if (!mapperInterface.equals(BaseMapper.class) || !parameters[i].getType().isArray() || !"pk".equals(param.value())) {
                 this.queryParameters.add(param.value());
                 continue;
             }
@@ -211,62 +187,62 @@ public class MapperMethodConfiguration {
     }
 
     private void initPrimaryKey() {
-        if(classAnnotation != null) {
+        if (classAnnotation != null) {
             this.primaryKey = classAnnotation.primaryKey();
         }
-        if(!Arrays.equals(methodAnnotation.primaryKey(), new String[] {""})) {
+        if (!Arrays.equals(methodAnnotation.primaryKey(), new String[] {""})) {
             this.primaryKey = methodAnnotation.primaryKey();
         }
-        if(primaryKey == null || Arrays.equals(primaryKey, new String[] {""})) {
+        if (primaryKey == null || Arrays.equals(primaryKey, new String[] {""})) {
             this.primaryKey = DEFAULT_PRIMARY_KEY;
         }
     }
 
     private void initSuffix() {
-        if(classAnnotation != null) {
+        if (classAnnotation != null) {
             this.suffix = classAnnotation.suffix();
         }
-        if(!CommonUtil.empty(methodAnnotation.suffix())) {
+        if (CommonUtil.notEmpty(methodAnnotation.suffix())) {
             this.suffix = methodAnnotation.suffix();
         }
-        if(CommonUtil.empty(suffix)) {
+        if (CommonUtil.empty(suffix)) {
             this.suffix = DEFAULT_SUFFIX;
         }
     }
 
     private void initWhere() {
         this.where = "";
-        if(!methodAnnotation.extend()) {
-            if(!CommonUtil.empty(methodAnnotation.where())) {
+        if (!methodAnnotation.extend()) {
+            if (CommonUtil.notEmpty(methodAnnotation.where())) {
                 this.where = getSeparator(methodAnnotation) + methodAnnotation.where();
             }
             return;
         }
-        if(classAnnotation == null && CommonUtil.empty(methodAnnotation.where())) {
-            return ;
+        if (classAnnotation == null && CommonUtil.empty(methodAnnotation.where())) {
+            return;
         }
-        if(classAnnotation != null && CommonUtil.empty(classAnnotation.where()) && CommonUtil.empty(methodAnnotation.where())) {
-            return ;
+        if (classAnnotation != null && CommonUtil.empty(classAnnotation.where()) && CommonUtil.empty(methodAnnotation.where())) {
+            return;
         }
-        if(!CommonUtil.empty(methodAnnotation.where())) {
+        if (CommonUtil.notEmpty(methodAnnotation.where())) {
             this.where = getSeparator(methodAnnotation) + methodAnnotation.where();
         }
-        if(classAnnotation != null && !CommonUtil.empty(classAnnotation.where())) {
+        if (classAnnotation != null && CommonUtil.notEmpty(classAnnotation.where())) {
             this.where = getSeparator(classAnnotation) + classAnnotation.where() + this.where;
         }
     }
 
     private void initColumns() {
         this.columns = methodAnnotation.columns();
-        if(CommonUtil.empty(this.columns)) {
+        if (CommonUtil.empty(this.columns)) {
             this.columns = "*";
         }
-        if(operateEnum.pattern() == null || !methodAnnotation.parseColumn()) {
+        if (operateEnum.pattern() == null || !methodAnnotation.parseColumn()) {
             return;
         }
         String group = null;
         Matcher matcher = operateEnum.pattern().matcher(this.mapperMethod.getName());
-        if(!matcher.find() || CommonUtil.empty(group = matcher.group(1))) {
+        if (!matcher.find() || CommonUtil.empty(group = matcher.group(1))) {
             return;
         }
         List<String> columns = CommonUtil.split(group, "And").stream().map(CommonUtil::camelCase2Underline).collect(Collectors.toList());
@@ -282,35 +258,35 @@ public class MapperMethodConfiguration {
     }
 
     private void initTable() {
-        if(classAnnotation != null) {
+        if (classAnnotation != null) {
             this.table = classAnnotation.table();
         }
-        if(!CommonUtil.empty(methodAnnotation.table())) {
+        if (CommonUtil.notEmpty(methodAnnotation.table())) {
             this.table = methodAnnotation.table();
         }
-        if(!CommonUtil.empty(table)) {
-            return ;
+        if (CommonUtil.notEmpty(table)) {
+            return;
         }
-        if(!tableNameInvalid()) {
+        if (!tableNameInvalid()) {
             this.table = CommonUtil.camelCase2Underline(getReturnType().getSimpleName().replace(getSuffix(), ""));
-            return ;
+            return;
         }
-        if(operateEnum.equals(SQLOperateEnum.OPERATE_INSERT)          ||
+        if (operateEnum.equals(SQLOperateEnum.OPERATE_INSERT)         ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE)     ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_INSERT_ALL) ||
                 operateEnum.equals(SQLOperateEnum.OPERATE_UPDATE_ALL)) {
             this.table = CommonUtil.camelCase2Underline(getParameterType().getSimpleName().replace(getSuffix(), ""));
-            return ;
+            return;
         }
         this.table = CommonUtil.camelCase2Underline(childInterface.getSimpleName().replaceAll("Mapper$|Dao$", ""));
     }
 
     private void initSelectKey() {
         this.selectKey = mapperInterface.getAnnotation(SelectKey.class);
-        if(mapperInterface.equals(BaseMapper.class)) {
+        if (mapperInterface.equals(BaseMapper.class)) {
             this.selectKey = childInterface.getAnnotation(SelectKey.class);
         }
-        if(mapperMethod.isAnnotationPresent(SelectKey.class)) {
+        if (mapperMethod.isAnnotationPresent(SelectKey.class)) {
             this.selectKey = mapperMethod.getAnnotation(SelectKey.class);
         }
     }
@@ -331,11 +307,5 @@ public class MapperMethodConfiguration {
                 getReturnType().getSimpleName().endsWith("VO")           ||
                 getReturnType().getSimpleName().endsWith("Bo")           ||
                 getReturnType().getSimpleName().endsWith("BO");
-    }
-
-    private Class<?> parseMapReturnType(Type type) {
-        ParameterizedType mapType = (ParameterizedType) type;
-        Class<?> returnType = (Class<?>) mapType.getActualTypeArguments()[1];
-        return ReflectUtil.isBaseDataType(returnType) || returnType.equals(Object.class) ? HashMap.class : returnType;
     }
 }

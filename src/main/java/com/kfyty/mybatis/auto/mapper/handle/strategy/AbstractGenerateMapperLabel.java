@@ -76,10 +76,17 @@ public abstract class AbstractGenerateMapperLabel {
      * @return 单独的 <insert/> <update/> <select/> <delete/> 标签
      */
     public String getMapperLabel() {
-        if(CommonUtil.empty(this.xml)) {
+        if (CommonUtil.empty(this.xml)) {
             this.xml = this.generateMapperLabel();
         }
         return this.xml;
+    }
+
+    /**
+     * 重置生成的 mapper 标签
+     */
+    public void resetMapperXml() {
+        this.xml = null;
     }
 
     /**

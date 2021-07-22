@@ -30,7 +30,7 @@ public class MethodHandler {
     private Class<?> childInterface;
     private Method method;
     private Configuration configuration;
-    private MapperHandler mapperHandler;
+    private final MapperHandler mapperHandler;
 
     public MethodHandler() {
         this.mapperHandler = new MapperHandler();
@@ -57,24 +57,24 @@ public class MethodHandler {
         return this;
     }
 
-    public MethodHandler parse() {
+    public void doResolve() {
         MapperMethodConfiguration mapperMethodConfiguration = new MapperMethodConfiguration(childInterface, method, database);
-        this.mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).parse();
-        if(mapperHandler.supportMapperNode()) {
+        this.mapperHandler.setMapperMethodConfiguration(mapperMethodConfiguration).doResolve();
+        if (mapperHandler.supportMapperNode()) {
             this.parseMapperNode(mapperHandler.getMapperXml(), this.configuration);
-            return this;
+        } else  {
+            this.parseMapperLabel(this.childInterface, mapperHandler.getMapperXml(), mapperHandler.getMapperNodeType(), this.configuration);
         }
-        this.parseMapperLabel(this.childInterface, mapperHandler.getMapperXml(), mapperHandler.getMapperNodeType(), this.configuration);
-        return this;
+        this.mapperHandler.resetMapperXml();
     }
 
     public void parseMapperNode(String xml, Configuration configuration) {
         InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(inputStream, configuration, xml, new HashMap<>());
         xmlMapperBuilder.parse();
-        if(log.isDebugEnabled()) {
-            log.debug("Auto mapper label for method:\n[{}]", method);
-            log.debug("Auto mapper label:\n[{}]", xml);
+        if (log.isDebugEnabled()) {
+            log.debug("Auto mapper label for method:\r\n[{}]", method);
+            log.debug("Auto mapper label:\r\n[{}]", xml);
         }
     }
 
@@ -84,9 +84,9 @@ public class MethodHandler {
         XNode xNode = new XPathParser(xml).evalNode(nodeType);
         XMLStatementBuilder xmlStatementBuilder = new XMLStatementBuilder(configuration, mapperBuilderAssistant, xNode, configuration.getDatabaseId());
         xmlStatementBuilder.parseStatementNode();
-        if(log.isDebugEnabled()) {
-            log.debug("Auto mapper label for method:\n[{}]", method);
-            log.debug("Auto mapper label:\n[{}]", xml);
+        if (log.isDebugEnabled()) {
+            log.debug("Auto mapper label for method:\r\n[{}]", method);
+            log.debug("Auto mapper label:\r\n[{}]", xml);
         }
     }
 }

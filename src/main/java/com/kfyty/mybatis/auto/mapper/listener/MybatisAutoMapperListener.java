@@ -46,7 +46,7 @@ public class MybatisAutoMapperListener implements ApplicationListener<ContextRef
             Collection<Class<?>> mapperInterfaces = configuration.getMapperRegistry().getMappers();
             for (Class<?> mapperInterface : mapperInterfaces) {
                 Method[] methods = mapperInterface.getMethods();
-                Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> methodHandler.setHandleData(mapperInterface, e, configuration).parse());
+                Arrays.stream(methods).filter(e -> e.isAnnotationPresent(AutoMapper.class)).forEach(e -> methodHandler.setHandleData(mapperInterface, e, configuration).doResolve());
             }
             if(configuration.getInterceptors().stream().noneMatch(e -> PageInterceptor.class.isAssignableFrom(e.getClass()))) {
                 configuration.addInterceptor(applicationContext.getBean(PageInterceptor.class));

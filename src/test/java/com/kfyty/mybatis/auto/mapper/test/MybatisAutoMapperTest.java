@@ -38,9 +38,8 @@ public class MybatisAutoMapperTest {
 
     /**
      * where: 所有的查询/更新均需要拼接的条件
-     * entity: 因为该拓展包只在应用启动时起作用，因此继承自 BaseMapper 的接口必须指定实体类型
      */
-    @AutoMapper(entity = MybatisAutoMapperTest.class, where = "DELETE = 0")
+    @AutoMapper(where = "DELETE = 0")
     private interface AutoMapperTest extends BaseMapper<Integer, MybatisAutoMapperTest> {
         /**
          * 需要解析的方法需要添加 @AutoMapper 注解
@@ -165,6 +164,22 @@ public class MybatisAutoMapperTest {
         int countById(@Param("id") Integer id);
 
         /**
+         * 返回值为 Map 测试
+         * @param name name
+         * @return Map
+         */
+        @AutoMapper
+        Map<String, Object> findByName(@Param("name") String name);
+
+        /**
+         * 返回值为 List<Map> 测试
+         * @param ids ids
+         * @return List
+         */
+        @AutoMapper
+        List<Map<String, Object>> findByIdIn(@Param("ids") List<Integer> ids);
+
+        /**
          * 返回值为 Map<PrimaryKey, Entity> 时，须使用 @MapKey 注解指定 key 属性
          * @param id id
          * @return map
@@ -194,7 +209,7 @@ public class MybatisAutoMapperTest {
         Arrays.stream(AutoMapperTest.class.getMethods())
                 .filter(e -> e.isAnnotationPresent(AutoMapper.class))
                 .sorted(Comparator.comparing(Method::getName))
-                .map(e -> mapperHandler.setMapperMethodConfiguration(new MapperMethodConfiguration(AutoMapperTest.class, e, database)).parse().getMapperXml())
+                .map(e -> mapperHandler.setMapperMethodConfiguration(new MapperMethodConfiguration(AutoMapperTest.class, e, database)).doResolve().getMapperXml())
                 .forEach(System.out::println);
     }
 }
