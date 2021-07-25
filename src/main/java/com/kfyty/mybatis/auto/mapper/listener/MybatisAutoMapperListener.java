@@ -7,9 +7,10 @@ import com.kfyty.support.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -24,17 +25,16 @@ import java.util.Map;
  * @since JDK 1.8
  */
 @Slf4j
-public class MybatisAutoMapperListener implements ApplicationListener<ContextRefreshedEvent> {
+public class MybatisAutoMapperListener implements ApplicationContextAware, InitializingBean {
+    private ApplicationContext applicationContext;
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent applicationEvent) {
-        if(applicationEvent.getApplicationContext().getParent() == null) {
-            this.parseMapperInterface(applicationEvent);
-        }
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
-    private void parseMapperInterface(ContextRefreshedEvent contextRefreshedEvent) {
-        ConfigurableApplicationContext applicationContext = (ConfigurableApplicationContext) contextRefreshedEvent.getApplicationContext();
+    @Override
+    public void afterPropertiesSet() throws Exception {
         Map<String, SqlSessionFactory> sqlSessionFactoryMap = applicationContext.getBeansOfType(SqlSessionFactory.class);
         if(CommonUtil.empty(sqlSessionFactoryMap)) {
             log.info("No SqlSessionFactory instance found !");

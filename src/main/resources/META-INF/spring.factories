@@ -1,3 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.kfyty.mybatis.auto.mapper.interceptor.MybatisPageInterceptorConfig
-
-org.springframework.context.ApplicationListener=com.kfyty.mybatis.auto.mapper.listener.MybatisAutoMapperListener
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.kfyty.mybatis.auto.mapper.interceptor.MybatisPageInterceptorConfig,\
+  com.kfyty.mybatis.auto.mapper.listener.MybatisAutoMapperListener
