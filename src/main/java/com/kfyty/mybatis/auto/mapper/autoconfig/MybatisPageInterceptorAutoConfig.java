@@ -1,4 +1,4 @@
-package com.kfyty.mybatis.auto.mapper.interceptor;
+package com.kfyty.mybatis.auto.mapper.autoconfig;
 
 import com.github.pagehelper.PageInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.Properties;
  * @date 2019/11/14 19:48
  * @since JDK 1.8
  */
-public class MybatisPageInterceptorConfig {
+public class MybatisPageInterceptorAutoConfig {
     @Autowired(required = false)
     @Qualifier("pageInterceptorProperties")
     private Properties properties;
@@ -23,13 +23,12 @@ public class MybatisPageInterceptorConfig {
     @Bean
     @ConditionalOnMissingBean(PageInterceptor.class)
     public PageInterceptor createPageInterceptor() {
-        Properties properties = new Properties();
-        properties.setProperty("supportMethodsArguments", "true");
-        if(this.properties != null) {
-            properties = this.properties;
+        if (this.properties == null) {
+            this.properties = new Properties();
+            this.properties.setProperty("supportMethodsArguments", "true");
         }
         PageInterceptor pageInterceptor = new PageInterceptor();
-        pageInterceptor.setProperties(properties);
+        pageInterceptor.setProperties(this.properties);
         return pageInterceptor;
     }
 }
