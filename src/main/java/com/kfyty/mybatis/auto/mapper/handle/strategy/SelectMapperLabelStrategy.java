@@ -1,6 +1,6 @@
 package com.kfyty.mybatis.auto.mapper.handle.strategy;
 
-import com.kfyty.support.utils.CommonUtil;
+import com.kfyty.core.utils.CommonUtil;
 import lombok.NoArgsConstructor;
 
 /**

@@ -3,8 +3,8 @@ package com.kfyty.mybatis.auto.mapper.handle.strategy;
 import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.annotation.Transient;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.support.utils.CommonUtil;
-import com.kfyty.support.utils.ReflectUtil;
+import com.kfyty.core.utils.CommonUtil;
+import com.kfyty.core.utils.ReflectUtil;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;

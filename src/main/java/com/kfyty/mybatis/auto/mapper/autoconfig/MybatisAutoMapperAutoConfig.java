@@ -3,7 +3,7 @@ package com.kfyty.mybatis.auto.mapper.autoconfig;
 import com.github.pagehelper.PageInterceptor;
 import com.kfyty.mybatis.auto.mapper.annotation.AutoMapper;
 import com.kfyty.mybatis.auto.mapper.handle.MethodHandler;
-import com.kfyty.support.utils.CommonUtil;
+import com.kfyty.core.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.Configuration;

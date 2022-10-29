@@ -5,7 +5,7 @@ import com.kfyty.mybatis.auto.mapper.annotation.Column;
 import com.kfyty.mybatis.auto.mapper.configure.MapperMethodConfiguration;
 import com.kfyty.mybatis.auto.mapper.match.SQLConditionEnum;
 import com.kfyty.mybatis.auto.mapper.match.SQLOperateEnum;
-import com.kfyty.support.utils.CommonUtil;
+import com.kfyty.core.utils.CommonUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
