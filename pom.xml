@@ -27,7 +27,7 @@
 
         <kfyty.utils.version>1.0-SNAPSHOT</kfyty.utils.version>
 
-        <spring.version>5.2.0.RELEASE</spring.version>
+        <spring.version>5.2.20.RELEASE</spring.version>
         <springboot.version>2.1.7.RELEASE</springboot.version>
 
         <mybatis.version>3.5.6</mybatis.version>
